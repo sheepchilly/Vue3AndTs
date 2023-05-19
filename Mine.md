@@ -280,12 +280,12 @@ module.exports = {
 
 5.当我们运行 npm format 的时候，会把代码直接格式化
 
-## 5.配置husky
+## 5.配置 husky
 
-- 什么是husky？husky在代码提交之前触发git hook(git在客户端的钩子)，然后执行npm run format来自动格式化代码
-- 也就是在往git提交代码前先进行格式化
+- 什么是 husky？husky 在代码提交之前触发 git hook(git 在客户端的钩子)，然后执行 npm run format 来自动格式化代码
+- 也就是在往 git 提交代码前先进行格式化
 
-1.安装husky
+  1.安装 husky
 
 ```js
 npm install -D husky --force
