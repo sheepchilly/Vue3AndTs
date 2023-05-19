@@ -9,5 +9,9 @@ const fun = ()=>
 {
   console.log('这是没有格式化的代码')
 }
+const hello =()=>
+{
+  console.log('hello')
+}
 
 fun();

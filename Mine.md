@@ -283,10 +283,28 @@ module.exports = {
 ## 5.配置husky
 
 - 什么是husky？husky在代码提交之前触发git hook(git在客户端的钩子)，然后执行npm run format来自动格式化代码
+- 也就是在往git提交代码前先进行格式化
 
 1.安装husky
 
 ```js
-npm install -D husky
+npm install -D husky --force
 ```
 
+2.执行
+
+```js
+npx husky-init
+```
+
+会在根目录下生成个一个.husky 目录，在这个目录下面会有一个 pre-commit 文件，这个文件里面的命令在我们执行 commit 的时候就会执行
+
+在`.husky/pre-commit`文件添加如下命令：
+
+```js
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+npm run format
+```
+
+当我们对代码进行 commit 操作的时候，就会执行命令，对代码进行格式化，然后再提交。
