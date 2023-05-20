@@ -1053,11 +1053,11 @@ export default () => {
 import 'virtual:svg-icons-register'
 ```
 
-**使用svg图标**
+**使用 svg 图标**
 
-1.在assets文件夹下新建icon文件夹，专门用于存储svg图标
+1.在 assets 文件夹下新建 icon 文件夹，专门用于存储 svg 图标
 
-2.在需要使用的地方使用<svg>+<use>来使用svg图标
+2.在需要使用的地方使用<svg>+<use>来使用 svg 图标
 
 ```js
 <template>
@@ -1073,16 +1073,14 @@ import 'virtual:svg-icons-register'
 </template>
 ```
 
-
-
 #### 3.4.1svg 封装为全局组件
 
 因为项目很多模块需要使用图标,因此把它封装为全局组件！！！
 
-- 如何改变图标？用defineProps接收父组件传递过来的参数，如图标样式、图标颜色（**注意：**:xlink必须写成动态的，也就是v-bind的简写: ）
-- 父组件如何传递参数？在组件标签上xx="xxx"传递 ->   <svg-icon name="phone"></svg-icon>
+- 如何改变图标？用 defineProps 接收父组件传递过来的参数，如图标样式、图标颜色（**注意：**:xlink 必须写成动态的，也就是 v-bind 的简写: ）
+- 父组件如何传递参数？在组件标签上 xx="xxx"传递 -> <svg-icon name="phone"></svg-icon>
 
-1.**在 src/components 目录下创建一个 SvgIcon 组件:代表如下**
+  1.**在 src/components 目录下创建一个 SvgIcon 组件:代表如下**
 
 ```js
 //封装的组件svgIcon
@@ -1128,7 +1126,7 @@ defineProps({
     <svg-icon name="phone" color="pink" width="100px" height="100px"></svg-icon>
 ```
 
-2.很多组件都会使用到svg组件，所以注册成全局组件 - 但是因为封装的组件过多，不可能每一次都在main.ts中注册一次，所以使用自定义插件，把这些自定义组件注册成全局的，在 src 文件夹目录下创建一个 index.ts 文件：用于注册 components 文件夹内部全部全局组件！！！
+2.很多组件都会使用到 svg 组件，所以注册成全局组件 - 但是因为封装的组件过多，不可能每一次都在 main.ts 中注册一次，所以使用自定义插件，把这些自定义组件注册成全局的，在 src 文件夹目录下创建一个 index.ts 文件：用于注册 components 文件夹内部全部全局组件！！！
 
 ```js
 //引入项目中全部的全局组件
@@ -1136,26 +1134,26 @@ import SvgIcon from './SvgIcon/index.vue'
 import Pagination from './Pagination/index.vue'
 
 //全局对象
-const allGlobalComponent = {SvgIcon,Pagination}
+const allGlobalComponent = { SvgIcon, Pagination }
 
 //对外暴露插件对象
-export default{
-    //必须要叫install方法
-    install(app){
-        //注册项目的全部的全局组件
-        Object.keys(allGlobalComponent).forEach(key=>{
-            //注册为全局组件
-            app.component(key,allGlobalComponent[key])
-        })
-    }
+export default {
+  //必须要叫install方法
+  install(app) {
+    //注册项目的全部的全局组件
+    Object.keys(allGlobalComponent).forEach((key) => {
+      //注册为全局组件
+      app.component(key, allGlobalComponent[key])
+    })
+  },
 }
 ```
 
 在入口文件引入 src/index.ts 文件,通过 app.use 方法安装自定义插件
 
 ```js
-import gloablComponent from './components/index';
-app.use(gloablComponent);
+import gloablComponent from './components/index'
+app.use(gloablComponent)
 ```
 
 ### 3.5 集成 sass
@@ -1168,7 +1166,7 @@ app.use(gloablComponent);
 
 接下来我们为项目添加一些全局的样式
 
-在 src/styles 目录下创建一个 index.scss 文件，当然项目中需要用到清除默认样式，因此在 index.scss 引入 reset.scss（reset.css中的内容需要到npm官方搜索reset.scss然后将内容复制到文件当中）
+在 src/styles 目录下创建一个 index.scss 文件，当然项目中需要用到清除默认样式，因此在 index.scss 引入 reset.scss（reset.css 中的内容需要到 npm 官方搜索 reset.scss 然后将内容复制到文件当中）
 
 ```
 @import reset.scss
@@ -1329,56 +1327,58 @@ pnpm install axios
 在根目录下创建 utils/request.ts
 
 ```js
-import axios from "axios";
-import { ElMessage } from "element-plus";
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
 //创建axios实例
 let request = axios.create({
-    baseURL: import.meta.env.VITE_APP_BASE_API,
-    timeout: 5000
+  baseURL: import.meta.env.VITE_APP_BASE_API,
+  timeout: 5000,
 })
 //请求拦截器
-request.interceptors.request.use(config => {
-    return config;
-});
+request.interceptors.request.use((config) => {
+  return config
+})
 //响应拦截器
-request.interceptors.response.use((response) => {
-    return response.data;
-}, (error) => {
+request.interceptors.response.use(
+  (response) => {
+    return response.data
+  },
+  (error) => {
     //处理网络错误
-    let msg = '';
-    let status = error.response.status;
+    let msg = ''
+    let status = error.response.status
     switch (status) {
-        case 401:
-            msg = "token过期";
-            break;
-        case 403:
-            msg = '无权访问';
-            break;
-        case 404:
-            msg = "请求地址错误";
-            break;
-        case 500:
-            msg = "服务器出现问题";
-            break;
-        default:
-            msg = "无网络";
-
+      case 401:
+        msg = 'token过期'
+        break
+      case 403:
+        msg = '无权访问'
+        break
+      case 404:
+        msg = '请求地址错误'
+        break
+      case 500:
+        msg = '服务器出现问题'
+        break
+      default:
+        msg = '无网络'
     }
     ElMessage({
-        type: 'error',
-        message: msg
+      type: 'error',
+      message: msg,
     })
     //返回一个失败的Promise对象，用来终止Promise链
-    return Promise.reject(error);
-});
-export default request;
+    return Promise.reject(error)
+  },
+)
+export default request
 ```
 
 ### 3.8API 接口统一管理
 
 在开发项目的时候,接口可能很多需要统一管理。在 src 目录下去创建 api 文件夹去统一管理项目的接口；
 
-比如:下面方式（user文件夹下的index.ts）
+比如:下面方式（user 文件夹下的 index.ts）
 
 ```js
 //统一管理咱们项目用户相关的接口
@@ -1425,41 +1425,39 @@ export const reqLogout = () => request.post<any, any>(API.LOGOUT_URL)
 
 //登录接口需要携带参数ts类型
 export interface loginForm {
-    username: string,
-    password: string
+  username: string;
+  password: string;
 }
 
 //登录接口返回的数据类型
 interface dataType {
-    token: String
+  token: String;
 }
 export interface loginResponseData {
-    code: Number,
-    data: dataType
+  code: Number;
+  data: dataType;
 }
 
 //定义服务器返回用户信息相关的数据类型
 interface userInfo {
-    userId: number,
-    avatar:string,
-    username: string,
-    password: string,
-    desc: string,
-    roles: string[], //数组字符串
-    buttons: string[],
-    routes: string[],
-    token: string
+  userId: number;
+  avatar: string;
+  username: string;
+  password: string;
+  desc: string;
+  roles: string[]; //数组字符串
+  buttons: string[];
+  routes: string[];
+  token: string;
 }
 interface user {
-    checkUser: userInfo
+  checkUser: userInfo;
 }
 export interface userResponseData {
-    code: number,
-    data: user
+  code: number;
+  data: user;
 }
 ```
-
-
 
 ## 四、项目的资源地址
 
@@ -1481,7 +1479,127 @@ https://www.isqqw.com/echarts-doc/zh/option.html#title
 
 http://datav.aliyun.com/portal/school/atlas/area_selector
 
-
-
 # 三.路由配置
 
+## 2.1基本路由配置
+
+1.在router文件夹下新建index.ts文件，使用createRouter创建路由，新建router变量接收createRouter生成的实例对象，并向外暴露router
+
+```js
+//创建vue-router插件实现模板路由配置
+import {createRouter,createWebHashHistory} from 'vue-router'
+import {constantRoute} from './routes.ts'
+
+//创建路由器
+let router = createRouter({
+    // 配置路由模式hash，需要引入createWebHashHistory
+    history:createWebHashHistory(),
+    routes:constantRoute,
+    //滚动行为 - 使用前端路由，当切换到新路由时，想要页面滚到顶部，或者是保持原先的滚动位置
+    scrollBehavior(){
+        return{
+            left:0,
+            top:0
+        }
+    }
+});
+
+export default router;
+```
+
+2.将router中的routes子路由放在新的文件中方便集中管理，新建routes.ts文件，向外暴露constantRoute对象
+
+```js
+//对外暴露配置的路由
+export const constantRoute = [
+    {
+        path:'/login',
+        component:()=>import('@/views/login/index.vue'),
+        name:'login'
+    },
+    {
+        path:'/',
+        component:()=>import('@/views/home/index.vue'),
+        name:'layout'
+    },
+    {
+        path:'/404',
+        component:()=>import('@/views/404/index.vue'),
+        name:'404'
+    },
+    {
+        path:'/:pathMatch(.*)*',//任意路由匹配：以上路由都没有匹配上时会走这里
+        redirect:'/404', //重定向到404页面
+        name:'Any'
+    }
+]
+```
+
+3.在main.ts中将路由注册为全局路由
+
+```js
+import router from '@/router/index.ts'
+.use(router)
+```
+
+# 四.Pinia仓库配置
+
+1.在store文件加下新建index.ts文件，作为大仓库，使用createPinia创建大仓库
+
+```js
+import {createPinia} from 'pinia'
+//创建大仓库
+let pinia = createPinia()
+
+//向外暴漏大仓库
+export default pinia
+```
+
+2.在store下新建文件夹modules里面用于存放小仓库，新建user.ts存放用户信息（选择式API写法）
+
+```js
+//用户信息小仓库
+
+import {defineStore} from 'pinia'
+//创建用户小仓库
+let useUserStore = defineStore('User',{
+    // 存储数据
+    state:()=>{
+        return{
+            num:1
+        }
+    },
+    // 异步|逻辑 
+    actions:{
+    },
+    //计算属性
+    getters:{
+    }
+})
+//对外暴露获取小仓库的方法
+export default useUserStore;
+```
+
+3.在main.ts中注册大仓库
+
+```js
+import pinia from '@/store/index.ts'
+.use(pinia)
+```
+
+4.在页面中使用仓库，**注意**必须要实例化才能生成小仓库
+
+```js
+import useUserStore from '@/store/modules/user'
+let useStore = useUserStore() //实例化小仓库
+
+onMounted(()=>{
+  console.log(useStore.num)
+})
+```
+
+
+
+# 五.登陆页面
+
+1.点击登录按钮之后：通知仓库去发登录请求 -> 请求成功：跳转到首页 -/ 请求失败：在当前页弹出登录失败的信息

@@ -1,13 +1,7 @@
 <template>
-  <div>
-    Pagination
-  </div>
+  <div>Pagination</div>
 </template>
 
-<script setup>
+<script setup></script>
 
-</script>
-
-<style>
-
-</style>
+<style></style>
