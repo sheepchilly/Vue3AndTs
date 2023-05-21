@@ -1481,73 +1481,73 @@ http://datav.aliyun.com/portal/school/atlas/area_selector
 
 # 三.路由配置
 
-## 2.1基本路由配置
+## 2.1 基本路由配置
 
-1.在router文件夹下新建index.ts文件，使用createRouter创建路由，新建router变量接收createRouter生成的实例对象，并向外暴露router
+1.在 router 文件夹下新建 index.ts 文件，使用 createRouter 创建路由，新建 router 变量接收 createRouter 生成的实例对象，并向外暴露 router
 
 ```js
 //创建vue-router插件实现模板路由配置
-import {createRouter,createWebHashHistory} from 'vue-router'
-import {constantRoute} from './routes.ts'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { constantRoute } from './routes.ts'
 
 //创建路由器
 let router = createRouter({
-    // 配置路由模式hash，需要引入createWebHashHistory
-    history:createWebHashHistory(),
-    routes:constantRoute,
-    //滚动行为 - 使用前端路由，当切换到新路由时，想要页面滚到顶部，或者是保持原先的滚动位置
-    scrollBehavior(){
-        return{
-            left:0,
-            top:0
-        }
+  // 配置路由模式hash，需要引入createWebHashHistory
+  history: createWebHashHistory(),
+  routes: constantRoute,
+  //滚动行为 - 使用前端路由，当切换到新路由时，想要页面滚到顶部，或者是保持原先的滚动位置
+  scrollBehavior() {
+    return {
+      left: 0,
+      top: 0,
     }
-});
+  },
+})
 
-export default router;
+export default router
 ```
 
-2.将router中的routes子路由放在新的文件中方便集中管理，新建routes.ts文件，向外暴露constantRoute对象
+2.将 router 中的 routes 子路由放在新的文件中方便集中管理，新建 routes.ts 文件，向外暴露 constantRoute 对象
 
 ```js
 //对外暴露配置的路由
 export const constantRoute = [
-    {
-        path:'/login',
-        component:()=>import('@/views/login/index.vue'),
-        name:'login'
-    },
-    {
-        path:'/',
-        component:()=>import('@/views/home/index.vue'),
-        name:'layout'
-    },
-    {
-        path:'/404',
-        component:()=>import('@/views/404/index.vue'),
-        name:'404'
-    },
-    {
-        path:'/:pathMatch(.*)*',//任意路由匹配：以上路由都没有匹配上时会走这里
-        redirect:'/404', //重定向到404页面
-        name:'Any'
-    }
+  {
+    path: '/login',
+    component: () => import('@/views/login/index.vue'),
+    name: 'login',
+  },
+  {
+    path: '/',
+    component: () => import('@/views/home/index.vue'),
+    name: 'layout',
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/404/index.vue'),
+    name: '404',
+  },
+  {
+    path: '/:pathMatch(.*)*', //任意路由匹配：以上路由都没有匹配上时会走这里
+    redirect: '/404', //重定向到404页面
+    name: 'Any',
+  },
 ]
 ```
 
-3.在main.ts中将路由注册为全局路由
+3.在 main.ts 中将路由注册为全局路由
 
 ```js
 import router from '@/router/index.ts'
 .use(router)
 ```
 
-# 四.Pinia仓库配置
+# 四.Pinia 仓库配置
 
-1.在store文件加下新建index.ts文件，作为大仓库，使用createPinia创建大仓库
+1.在 store 文件加下新建 index.ts 文件，作为大仓库，使用 createPinia 创建大仓库
 
 ```js
-import {createPinia} from 'pinia'
+import { createPinia } from 'pinia'
 //创建大仓库
 let pinia = createPinia()
 
@@ -1555,32 +1555,30 @@ let pinia = createPinia()
 export default pinia
 ```
 
-2.在store下新建文件夹modules里面用于存放小仓库，新建user.ts存放用户信息（选择式API写法）
+2.在 store 下新建文件夹 modules 里面用于存放小仓库，新建 user.ts 存放用户信息（选择式 API 写法）
 
 ```js
 //用户信息小仓库
 
-import {defineStore} from 'pinia'
+import { defineStore } from 'pinia'
 //创建用户小仓库
-let useUserStore = defineStore('User',{
-    // 存储数据
-    state:()=>{
-        return{
-            num:1
-        }
-    },
-    // 异步|逻辑 
-    actions:{
-    },
-    //计算属性
-    getters:{
+let useUserStore = defineStore('User', {
+  // 存储数据
+  state: () => {
+    return {
+      num: 1,
     }
+  },
+  // 异步|逻辑
+  actions: {},
+  //计算属性
+  getters: {},
 })
 //对外暴露获取小仓库的方法
-export default useUserStore;
+export default useUserStore
 ```
 
-3.在main.ts中注册大仓库
+3.在 main.ts 中注册大仓库
 
 ```js
 import pinia from '@/store/index.ts'
@@ -1593,13 +1591,174 @@ import pinia from '@/store/index.ts'
 import useUserStore from '@/store/modules/user'
 let useStore = useUserStore() //实例化小仓库
 
-onMounted(()=>{
+onMounted(() => {
   console.log(useStore.num)
 })
 ```
+
+5 Pinia持久化存储
+
+在这里用的是**本地存储Localstorage**
 
 
 
 # 五.登陆页面
 
-1.点击登录按钮之后：通知仓库去发登录请求 -> 请求成功：跳转到首页 -/ 请求失败：在当前页弹出登录失败的信息
+## 1.登录按钮发请求
+
+1.点击登录按钮之后：通知仓库去发登录请求 -> 请求成功：跳转到首页并且存储token -/ 请求失败：在当前页弹出登录失败的信息
+
+2.async会返回一个Promise对象，Promise对象有三个状态：pending、fullfill、reject。状态取决于返回的结果，所以可以在成功的回调里return OK，在失败的回调里return一个错误对象，这样当点击登录按钮发请求时就可以知道本次请求是成功还是失败了
+
+```js
+  actions: {
+    //data的类型是loginForm
+    async userLogin(data:loginForm){
+      let result:any = await reqLogin(data)
+      if(result.code == 200){
+        this.token = result.data.token
+        localStorage.setItem('TOKEN',result.data.token)
+        //能保证当前async函数返回一个成功的promise
+        return 'ok';
+      }else{
+        return Promise.reject(new Error(result.data.message))
+      }   
+    }
+  },
+```
+
+3.定义store仓库中的数据类型 - 1.state是一个函数，函数返回的对象的类型 2.登录返回的类型
+
+```js
+//1.登录返回的类型有code和data，data中又存在登陆成功返回token、登录失败返回message的情况，所以接口需要使用可选参数?:来定义两个数据类型
+interface dataType {
+  token?: string,
+  message?: string
+}
+export interface loginResponseData {
+  code: number
+  data: dataType
+}
+
+actions: {
+//data的类型是loginForm
+    async userLogin(data:loginForm){
+      let result:loginResponseData = await reqLogin(data)}
+}
+
+//2.state函数的返回类型是UserState
+export interface UserState {
+    //还没有登录的时候是null，登录成功后是string，所以用联合类型 |
+    token:null|string
+}
+
+//3.token要使用类型断言，只有在返回的是一个字符串的情况下才赋值给this.token
+this.token = (result.data.token as string)
+
+//4.将存储数据和获取数据封装成函数，这样可以直接调用
+--在utils新建token.ts文件
+//存储数据
+export const SET_TOKEN = (token:string)=>{
+    localStorage.setItem("TOKEN",token)
+}
+//获取数据
+export const GET_TOKEN = ()=>{
+    return localStorage.getItem("TOKEN")
+}
+--在需要使用本地存储的地方引入
+import {SET_TOKEN,GET_TOKEN} from '@/utils/token'
+  state: ():UserState => {
+    return {
+      token:GET_TOKEN() //使用获取本地存储函数
+    }
+  },
+action:{
+    async userLogin(data:loginForm){
+        SET_TOKEN(<string>result.data.token) //使用本地存储函数存储token
+    }
+}
+```
+
+## 2.登录成功的提示框
+
+**需求：**根据用户登录的不同时间，ElNotification中的title显示不同的信息
+
+**思路：**封装一个时间戳函数，获取当前时间是上午、下午、晚上（这里没有用库函数，而是直接用原生的Date()）
+
+```js
+title:`Hi,${getTime()}好`
+
+//在utils文件夹下新建time.ts文件
+//获取当前小时的时间
+export const getTime = ()=>{
+  let message = ''
+  //通过内置对象Date()函数
+  let hours = new Date().getHours()
+  if(hours<=9){
+    message = '早上'
+  }else if (hours <= 14){
+     message = '上午'
+  }else if(hours <= 18){
+    message = '下午'
+  }else{
+    message = '晚上'
+  }
+  return message
+}
+```
+
+## 3.表单校验
+
+1.在<el-form>上添加:model="" -> 目的是为了告诉表单，将来收集的数据放在哪一个表单上
+
+```js
+<el-form :model="loginForm" class="login_form" ref="ruleFormRef" :rules="rules">
+```
+
+2.给表单添加规则，在<el-form>上添加:rules="rules"，然后新建表单校验对象
+
+```js
+const rules = reactive({
+  username: { require: true, message: '请输入用户名', trigger: 'blur' },
+  password: { require: true, message: '请输入密码', trigger: 'blur' },
+})
+```
+
+3.获取表单的DOM节点 -> ref ="ruleFormRef" -> cosnt ruleFormRef = ref(null) -> 表单校验规则validate方法
+
+```js
+ref="ruleFormRef"
+const ruleFormRef = ref(null)
+const login = async () => {
+  await ruleFormRef.value.validate()
+    /* ... */
+}
+```
+
+4.自定义表单校验规则（可以用于正则匹配）
+
+```js
+const rules = reactive({
+  username: [
+    //validator:自定义校验规则
+  {trigger:'change',validator:validatorUserName}
+],
+/* ... */
+}
+                       
+//自定义校验规则
+const validatorUserName = (_:any,value:any,callback:any)=>{
+  //rule为数组的校验规则对象,value为表单校验的文本内容,callback是一个函数，如果符合条件callBack会放行
+  if(/^\d{5,10}$/.test(value)){
+    callback()
+  }else{
+    callback(new Error('账号长度至少五位'))
+  }
+}                    
+```
+
+# 六.首页
+
+## 1.一级路由
+
+- 新建layout文件夹，将layout组件放在其中，独立封装成一级组件
