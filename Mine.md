@@ -1596,19 +1596,17 @@ onMounted(() => {
 })
 ```
 
-5 Pinia持久化存储
+5 Pinia 持久化存储
 
-在这里用的是**本地存储Localstorage**
-
-
+在这里用的是**本地存储 Localstorage**
 
 # 五.登陆页面
 
 ## 1.登录按钮发请求
 
-1.点击登录按钮之后：通知仓库去发登录请求 -> 请求成功：跳转到首页并且存储token -/ 请求失败：在当前页弹出登录失败的信息
+1.点击登录按钮之后：通知仓库去发登录请求 -> 请求成功：跳转到首页并且存储 token -/ 请求失败：在当前页弹出登录失败的信息
 
-2.async会返回一个Promise对象，Promise对象有三个状态：pending、fullfill、reject。状态取决于返回的结果，所以可以在成功的回调里return OK，在失败的回调里return一个错误对象，这样当点击登录按钮发请求时就可以知道本次请求是成功还是失败了
+2.async 会返回一个 Promise 对象，Promise 对象有三个状态：pending、fullfill、reject。状态取决于返回的结果，所以可以在成功的回调里 return OK，在失败的回调里 return 一个错误对象，这样当点击登录按钮发请求时就可以知道本次请求是成功还是失败了
 
 ```js
   actions: {
@@ -1622,12 +1620,12 @@ onMounted(() => {
         return 'ok';
       }else{
         return Promise.reject(new Error(result.data.message))
-      }   
+      }
     }
   },
 ```
 
-3.定义store仓库中的数据类型 - 1.state是一个函数，函数返回的对象的类型 2.登录返回的类型
+3.定义 store 仓库中的数据类型 - 1.state 是一个函数，函数返回的对象的类型 2.登录返回的类型
 
 ```js
 //1.登录返回的类型有code和data，data中又存在登陆成功返回token、登录失败返回message的情况，所以接口需要使用可选参数?:来定义两个数据类型
@@ -1681,26 +1679,26 @@ action:{
 
 ## 2.登录成功的提示框
 
-**需求：**根据用户登录的不同时间，ElNotification中的title显示不同的信息
+**需求：**根据用户登录的不同时间，ElNotification 中的 title 显示不同的信息
 
-**思路：**封装一个时间戳函数，获取当前时间是上午、下午、晚上（这里没有用库函数，而是直接用原生的Date()）
+**思路：**封装一个时间戳函数，获取当前时间是上午、下午、晚上（这里没有用库函数，而是直接用原生的 Date()）
 
 ```js
-title:`Hi,${getTime()}好`
+title: `Hi,${getTime()}好`
 
 //在utils文件夹下新建time.ts文件
 //获取当前小时的时间
-export const getTime = ()=>{
+export const getTime = () => {
   let message = ''
   //通过内置对象Date()函数
   let hours = new Date().getHours()
-  if(hours<=9){
+  if (hours <= 9) {
     message = '早上'
-  }else if (hours <= 14){
-     message = '上午'
-  }else if(hours <= 18){
+  } else if (hours <= 14) {
+    message = '上午'
+  } else if (hours <= 18) {
     message = '下午'
-  }else{
+  } else {
     message = '晚上'
   }
   return message
@@ -1724,14 +1722,14 @@ const rules = reactive({
 })
 ```
 
-3.获取表单的DOM节点 -> ref ="ruleFormRef" -> cosnt ruleFormRef = ref(null) -> 表单校验规则validate方法
+3.获取表单的 DOM 节点 -> ref ="ruleFormRef" -> cosnt ruleFormRef = ref(null) -> 表单校验规则 validate 方法
 
 ```js
-ref="ruleFormRef"
+ref = 'ruleFormRef'
 const ruleFormRef = ref(null)
 const login = async () => {
   await ruleFormRef.value.validate()
-    /* ... */
+  /* ... */
 }
 ```
 
@@ -1745,7 +1743,7 @@ const rules = reactive({
 ],
 /* ... */
 }
-                       
+
 //自定义校验规则
 const validatorUserName = (_:any,value:any,callback:any)=>{
   //rule为数组的校验规则对象,value为表单校验的文本内容,callback是一个函数，如果符合条件callBack会放行
@@ -1754,11 +1752,143 @@ const validatorUserName = (_:any,value:any,callback:any)=>{
   }else{
     callback(new Error('账号长度至少五位'))
   }
-}                    
+}
 ```
 
 # 六.首页
 
 ## 1.一级路由
 
-- 新建layout文件夹，将layout组件放在其中，独立封装成一级组件
+- 新建 layout 文件夹，将 layout 组件放在其中，独立封装成一级组件
+
+
+
+## 2.侧边栏
+
+1.菜单要抽离封装成组件，因为**菜单要根据配置的路由**来生成菜单，并且路由的名字不能写死，因为不同的项目展示的菜单不一样。**注意：**带有折叠效果的是二级路由。
+
+2.菜单组件需要直接拿到路由数组，所以把路由信息存在小仓库中
+
+```js
+import { constantRoute } from '@/router/routes'
+state: (): UserState => {
+    return {
+        /* ... */
+      menuRoutes:constantRoute, //路由对象
+    }
+  },
+```
+
+3.ts会有类型提示，menuRoutes是一个数组，数组里面放的是路由对象，所以需要定义menuRoutes的类型为vue-router提供的内置路由类型RouteRecordRaw
+
+```js
+//store下的types
+import { RouteRecordRaw } from 'vue-router'
+export interface UserState {
+    /* ... */
+  menuRoutes:RouteRecordRaw[], //路由数组
+}
+```
+
+4.在父组件中引入小仓库的路由数组，然后通过组件间通信将数组传给<Menu>组件，父v-bind传递，子defineprops接收
+
+```js
+//父组件
+import useUserStore  from '@/store/modules/user'
+let userStore = useUserStore()
+
+<Menu :menuList="userStore.menuRoutes" />
+    
+//子组件
+defineProps(['menuList'])
+```
+
+5.动态展示（v-for）路由数组中的数据，用v-if来控制当前路由是否有子路由，如果有子路由就使用<el-sub-menu>展示，没有就使用<el-menu>展示，但是展示不能展示路由地址，所以要使用**路由元信息**，给每一个路由起一个标题名字用于展示。
+
+```js
+//menu index.vue
+<template v-for="(item,index) in menuList" :key="item.path">
+    <el-menu-item v-if="!item.children">
+        <template #title>
+            <span>{{ item.meta.title }}</span>
+        </template>
+    </el-menu-item>
+</template>
+
+//router routes.vue -> meta路由元信息放路由标题
+export const constantRoute = [
+  {
+    path: '/login',
+    component: () => import('@/views/login/index.vue'),
+    name: 'login',
+    meta:{
+      title:'登录', //菜单标题
+    }
+  },
+```
+
+6.Menu组件中，用v-if判断当前路由是否满足以下条件，然后遍历生成侧边栏。如果有多层嵌套的子路由，用<el-sub-menu>加递归嵌套组件实现动态生成可折叠的侧边栏（**注意**：递归组件一定要有名字）
+
+```js
+//layout menu index.vue
+    <template v-for="(item, index) in menuList" :key="item.path">
+      <!-- 没有子路由 -->
+      <el-menu-item v-if="!item.children" :index="item.path">
+        <template #title>
+          <p>标志 &nbsp;</p>
+          <span>{{ item.meta.title }}</span>
+        </template>
+      </el-menu-item>
+      <!-- 有子路由，但是只有一个子路由 -->
+      <el-menu-item v-if="item.children && item.children.length == 1" :index="item.children[0].path">
+        <template #title>
+          <p>标志 &nbsp;</p>
+          <span>{{ item.children[0].meta.title }}</span>
+        </template>
+      </el-menu-item>
+      <!-- 有子路由，且个数大于1 -->
+      <el-sub-menu v-if="item.children&&item.children.length>1"  :index="item.path">
+        <template #title>
+            <span>{{ item.meta.title }}</span>
+        </template>
+        <!-- 递归组件嵌套 -->
+        <Menu :menuList="item.children"/>
+      </el-sub-menu>
+    </template>
+
+//递归组件的vue2模板语法，给组件起一个名字，不然<Menu>组件不会生效
+<script>
+export default{
+    name:'Menu'
+}
+</script>
+```
+
+7.侧边栏右侧白色边框取消
+
+```js
+.el-menu{
+    border-right: none;
+}
+```
+
+8.并不是所有的路由都需要在菜单当中需要展示，所以在路由元信息里加一个hidden:true/false 用于判断，在封装的Menu组件中，每一次判断的外层再嵌套一个<template>用于判断hidden为true或false
+
+```js
+//routes中
+meta:{
+      title:'登录', //菜单标题
+      hidden:true, //路由标题在菜单中是否隐藏 true:隐藏 false:不隐藏
+}
+
+//Menu index.vue
+  <template v-if="!item.children">
+  <el-menu-item v-if="!item.meta.hidden" :index="item.path">
+    <template #title>
+      <p>标志 &nbsp;</p>
+      <span>{{ item.meta.title }}</span>
+    </template>
+  </el-menu-item>
+</template>
+```
+

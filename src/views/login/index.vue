@@ -3,7 +3,12 @@
     <el-row>
       <el-col :span="12" :xs="0">占位的位置</el-col>
       <el-col :span="12" :xs="24">
-        <el-form :model="loginForm" class="login_form" ref="ruleFormRef" :rules="rules">
+        <el-form
+          :model="loginForm"
+          class="login_form"
+          ref="ruleFormRef"
+          :rules="rules"
+        >
           <h1>Hello</h1>
           <h2>欢迎来到万甄集团</h2>
           <el-form-item prop="username">
@@ -50,11 +55,11 @@ let $router = useRouter()
 let useStore = useUserStore()
 
 //自定义校验规则
-const validatorUserName = (_:any,value:any,callback:any)=>{
+const validatorUserName = (_: any, value: any, callback: any) => {
   //rule为数组的校验规则对象,value为表单校验的文本内容,callback是一个函数，如果符合条件callBack会放行
-  if(/^\d{5,10}$/.test(value)){
+  if (/^\d{5,10}$/.test(value)) {
     callback()
-  }else{
+  } else {
     callback(new Error('账号长度至少五位'))
   }
 }
@@ -64,8 +69,8 @@ const ruleFormRef = ref(null)
 const rules = reactive({
   username: [
     //validator:自定义校验规则
-      {trigger:'change',validator:validatorUserName}
-],
+    { trigger: 'change', validator: validatorUserName },
+  ],
   password: { required: true, message: '请输入密码', trigger: 'blur' },
 })
 
