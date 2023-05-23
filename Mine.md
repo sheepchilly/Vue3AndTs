@@ -1542,7 +1542,25 @@ import router from '@/router/index.ts'
 .use(router)
 ```
 
-# 四.Pinia 仓库配置
+## 2.2 全部路由配置
+
+1.首页一进入会重定向到Home首页，也就是进入以及路由'/'后会展示二级路由“home"页
+
+```js
+redirect:"/home"
+```
+
+2.views下的/screen也是一级路由
+
+3.acl和product也是一级路由，用的是layout的骨架，所以在view中的acl和product存放的都是二级路由
+
+4.因为有一级路由重定向了，会直接跳转，不需要点，有二级路由的才需要手动点击跳转
+
+5.**注意：**在封装的menu组件中，只有一级路由的<template>中也需要设置点击事件，回调函数跟多级路由用的是同一个goRoute函数
+
+6.数据大屏的路由/scrren会跳走的原因是：他不在layout下面
+
+# 四.Pinia 仓库配置 
 
 1.在 store 文件加下新建 index.ts 文件，作为大仓库，使用 createPinia 创建大仓库
 
@@ -1759,7 +1777,35 @@ const validatorUserName = (_:any,value:any,callback:any)=>{
 
 ## 1.一级路由
 
-- 新建 layout 文件夹，将 layout 组件放在其中，独立封装成一级组件
+- 新建 **layout** 文件夹，将 layout 组件（包含logo模块、menu菜单模块、main路由出口模块）放在其中，独立封装成一级组件
+- 在此路由下的二级路由都会有layout里的样式和模板（注意：screen不在layout中，所以没有样式和模板是独立的）
+- 把路由出口独立抽出来封装在main组件中是为了添加过渡动画
+
+### 1.1路由组件过渡动画
+
+使用transition+component搭配vue3的css动画 -> .v-enter-from - .v-enter-active - .v-enter-to
+
+```js
+<!-- 路由组件出口的位置 - v-slot插槽，会把要显示的组件注入 -->
+<router-view v-slot="{ Component }">
+    <transition name="fade">
+        <!-- 渲染layout一级路由组件的子路由 -->
+    <component :is="Component"></component>
+</transition>
+
+<style lang="scss" scoped>
+.fade-enter-from{
+    opacity: 0;
+}
+.fade-enter-active{
+    transition: all 0.5s;
+}
+.fade-enter-to{
+    opacity: 1;
+}
+</style>
+
+```
 
 
 
@@ -1779,18 +1825,18 @@ state: (): UserState => {
   },
 ```
 
-3.ts会有类型提示，menuRoutes是一个数组，数组里面放的是路由对象，所以需要定义menuRoutes的类型为vue-router提供的内置路由类型RouteRecordRaw
+3.ts 会有类型提示，menuRoutes 是一个数组，数组里面放的是路由对象，所以需要定义 menuRoutes 的类型为 vue-router 提供的内置路由类型 RouteRecordRaw
 
 ```js
 //store下的types
 import { RouteRecordRaw } from 'vue-router'
 export interface UserState {
-    /* ... */
-  menuRoutes:RouteRecordRaw[], //路由数组
+  /* ... */
+  menuRoutes: RouteRecordRaw[]; //路由数组
 }
 ```
 
-4.在父组件中引入小仓库的路由数组，然后通过组件间通信将数组传给<Menu>组件，父v-bind传递，子defineprops接收
+4.在父组件中引入小仓库的路由数组，然后通过组件间通信将数组传给<Menu>组件，父 v-bind 传递，子 defineprops 接收
 
 ```js
 //父组件
@@ -1798,12 +1844,12 @@ import useUserStore  from '@/store/modules/user'
 let userStore = useUserStore()
 
 <Menu :menuList="userStore.menuRoutes" />
-    
+
 //子组件
 defineProps(['menuList'])
 ```
 
-5.动态展示（v-for）路由数组中的数据，用v-if来控制当前路由是否有子路由，如果有子路由就使用<el-sub-menu>展示，没有就使用<el-menu>展示，但是展示不能展示路由地址，所以要使用**路由元信息**，给每一个路由起一个标题名字用于展示。
+5.动态展示（v-for）路由数组中的数据，用 v-if 来控制当前路由是否有子路由，如果有子路由就使用<el-sub-menu>展示，没有就使用<el-menu>展示，但是展示不能展示路由地址，所以要使用**路由元信息**，给每一个路由起一个标题名字用于展示。
 
 ```js
 //menu index.vue
@@ -1827,7 +1873,7 @@ export const constantRoute = [
   },
 ```
 
-6.Menu组件中，用v-if判断当前路由是否满足以下条件，然后遍历生成侧边栏。如果有多层嵌套的子路由，用<el-sub-menu>加递归嵌套组件实现动态生成可折叠的侧边栏（**注意**：递归组件一定要有名字）
+6.Menu 组件中，用 v-if 判断当前路由是否满足以下条件，然后遍历生成侧边栏。如果有多层嵌套的子路由，用<el-sub-menu>加递归嵌套组件实现动态生成可折叠的侧边栏（**注意**：递归组件一定要有名字）
 
 ```js
 //layout menu index.vue
@@ -1872,7 +1918,7 @@ export default{
 }
 ```
 
-8.并不是所有的路由都需要在菜单当中需要展示，所以在路由元信息里加一个hidden:true/false 用于判断，在封装的Menu组件中，每一次判断的外层再嵌套一个<template>用于判断hidden为true或false
+8.并不是所有的路由都需要在菜单当中需要展示，所以在路由元信息里加一个 hidden:true/false 用于判断，在封装的 Menu 组件中，每一次判断的外层再嵌套一个<template>用于判断 hidden 为 true 或 false
 
 ```js
 //routes中
@@ -1892,3 +1938,74 @@ meta:{
 </template>
 ```
 
+9.侧边栏默认激活（选中）的路由组件 => 使用Menu提供的default-ative=“”，可以通过useRouter获得当前的路径地址，然后把地址给default-active就可以默认激活了
+
+```js
+//获取路由对象
+import {useRoute} from'vue-router'
+let $route = useRoute()
+
+//使用:default-active动态的激活
+<el-menu background-color="#787785" text-color="white" :default-active="$route.path"> 
+
+```
+
+
+
+## 3.项目图标
+
+1.把elementPlus提供的图标变成全局组件
+
+2.在components的index.ts中，按照elementPlus文档中的步骤
+
+```js
+//引入elementPlus提供的全部图标组件
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
+//将elementPlus提供的图标注册为全局组件 - [key,component]:解构出组件的名字和相应的组件，把他们注册成全局组件
+console.log(Object.entries(ElementPlusIconsVue))
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+```
+
+3.图标具体的样式由用户决定，在路由元信息中增加icon字段，然后使用<el-icon>搭配<component>
+
+> component:一个用于渲染动态组件或元素的“元组件”。
+>
+> 1.要渲染的实际组件由 `is` prop 决定。
+>
+> 2.当 `is` 是字符串，它既可以是 HTML 标签名也可以是组件的注册名。或者，`is` 也可以直接绑定到组件的定义
+>
+> 3.<component :is="xxx" />
+
+```js
+//routes.ts
+meta: {
+  title: '登录', //菜单标题
+  hidden: false, //路由标题在菜单中是否隐藏 true:隐藏 false:不隐藏
+  icon:"Promotion", //菜单左侧文字图标，支持elementPlus全部图标
+},
+    
+//Menu index.vue
+<template #title>
+    <el-icon>
+      <component :is="item.meta.icon"></component> //渲染动态组件或元素的“元组件”
+    </el-icon>
+    <span>{{ item.meta.title }}</span>
+</template>
+```
+
+4.点击item的时候进行路由跳转
+
+**思路：**利用elementPlus提供的click方法回调，它会提供el-menu-item实例，里面的index放着当前路由的路径
+
+
+
+## 4.顶部tabbar
+
+在layout中封装成组件tabbar，然后再把tabbar中的左边和右边拆成两个子组件
+
+
+
+# 七.

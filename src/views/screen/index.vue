@@ -1,10 +1,11 @@
 <template>
   <div class="">
-</div>
+    我是数据大屏一级路由组件
+  </div>
 </template>
 
 <script setup>
-import {} from "vue"
+import {ref} from "vue"
 </script>
 
 <style lang="scss" scoped>

@@ -16,7 +16,7 @@ let useUserStore = defineStore('User', {
   state: (): UserState => {
     return {
       token: GET_TOKEN(),
-      menuRoutes:constantRoute, //路由对象
+      menuRoutes: constantRoute, //路由对象
     }
   },
   // 异步|逻辑

@@ -7,26 +7,35 @@
       <!-- 滚动组件 -->
       <el-scrollbar class="scrollbar">
         <!-- 菜单组件 -->
-        <el-menu background-color="#787785" text-color="white">
+        <el-menu background-color="#787785" text-color="white" :default-active="$route.path"> 
           <Menu :menuList="userStore.menuRoutes" />
         </el-menu>
       </el-scrollbar>
     </div>
     <!-- 顶部导航 -->
-    <div class="layout_tabbar">456</div>
+    <div class="layout_tabbar">
+      <Tabbar />
+
+    </div>
     <!-- 内容展示区 -->
     <div class="layout_main">
-      <p style="height: 2000px; background: skyblue">我是一个段落</p>
+      <Main />
     </div>
   </div>
 </template>
 
 <script setup>
+import {useRoute} from 'vue-router'
 import Logo from '@/layout/logo/index.vue'
 import Menu from '@/layout/menu/index.vue'
+import Main from '@/layout/main/index.vue'
+import Tabbar from '@/layout/tabbar/index.vue'
 //获取用户相关的小仓库
-import useUserStore  from '@/store/modules/user'
+import useUserStore from '@/store/modules/user'
 let userStore = useUserStore()
+const $route = useRoute()
+console.log($route.path)
+
 
 </script>
 
@@ -34,7 +43,7 @@ let userStore = useUserStore()
 .layout_container {
   width: 100%;
   height: 100vh;
-  background: pink;
+  // background: pink;
   display: flex;
   .layout_slider {
     width: $base-menu-width;
@@ -44,18 +53,18 @@ let userStore = useUserStore()
     .scrollbar {
       width: 100%;
       height: calc(100vh - $base-menu-logo-height);
-      .el-menu{
+      .el-menu {
         border-right: none;
       }
     }
   }
   .layout_tabbar {
     width: calc(100vw - $base-menu-width);
-    background: $base-menu-background;
     height: $base-tabbar-height;
     position: fixed;
     top: 0;
     left: $base-menu-width;
+    color:black;
   }
   .layout_main {
     position: relative;
@@ -66,6 +75,7 @@ let userStore = useUserStore()
     top: $base-tabbar-height;
     padding: 20px;
     overflow: auto;
+    background: pink;
   }
 }
 </style>
