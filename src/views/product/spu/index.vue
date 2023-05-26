@@ -1,12 +1,9 @@
 <template>
-  <div class="">
-    spu
-  </div>
+  <div class="">spu</div>
 </template>
 
 <script setup>
-import {ref} from "vue"
+import { ref } from 'vue'
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

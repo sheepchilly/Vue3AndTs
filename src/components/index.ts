@@ -4,12 +4,12 @@ import Pagination from './Pagination/index.vue'
 //引入elementPlus提供的全部图标组件
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 //全局对象
-const allGlobalComponent:any = { SvgIcon, Pagination }
+const allGlobalComponent: any = { SvgIcon, Pagination }
 
 //对外暴露插件对象
 export default {
   //必须要叫install方法
-  install(app:any) {
+  install(app: any) {
     //注册项目的全部的全局组件
     Object.keys(allGlobalComponent).forEach((key) => {
       //注册为全局组件

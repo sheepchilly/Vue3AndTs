@@ -1,7 +1,19 @@
 //对于axios进行二次封装，封装的目的是请求与相应拦截器
 
-import axios from 'axios'
+import axios, { Axios, AxiosResponse, AxiosRequestConfig } from "axios";
 import { ElMessage } from 'element-plus'
+import useUserStore from '@/store/modules/user'
+import {GET_TOKEN} from './token'
+
+//解决user仓库中result.code报错 类型“AxiosResponse<any, any>”上不存在属性“code”。(不生效)
+// declare module "axios" {
+//   interface AxiosResponse<T = any> {
+//     code:number,
+//     message:string,
+//     ok:boolean
+//   }
+//   export function create(config?: AxiosRequestConfig): AxiosInstance;
+// }
 
 //第一步：利用axios的create方法，去创建axios实例 - axios实例：可以配置请求的基础地址，请求超时时间
 let request = axios.create({
@@ -10,10 +22,12 @@ let request = axios.create({
   timeout: 5000, //超时时间
 })
 
-//第二步：给request实例添加请求与响应拦截器
+//第二步：请求拦截器
 request.interceptors.request.use((config) => {
-  config.headers.token = 'dy'
-  //config配置对象，里面有headers属性请求头，经常给服务器端携带公共参数
+  let userStore = useUserStore()
+  if(userStore.token){
+    config.headers.token = GET_TOKEN()
+  }  
   //返回配置对象
   return config
 })

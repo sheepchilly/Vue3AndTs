@@ -48,35 +48,37 @@ import { User, Lock } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import useUserStore from '@/store/modules/user'
-import { useRouter } from 'vue-router'
+import { useRouter,useRoute } from 'vue-router'
 import { getTime } from '@/utils/time'
 
 let $router = useRouter()
+let $route = useRoute()
 let useStore = useUserStore()
 
 //自定义校验规则
-const validatorUserName = (_: any, value: any, callback: any) => {
+// const validatorUserName = (_: any, value: any, callback: any) => {
   //rule为数组的校验规则对象,value为表单校验的文本内容,callback是一个函数，如果符合条件callBack会放行
-  if (/^\d{5,10}$/.test(value)) {
-    callback()
-  } else {
-    callback(new Error('账号长度至少五位'))
-  }
-}
+  // if (/^\d{4,10}$/.test(value)) {
+  //   callback()
+  // } else {
+  //   callback(new Error('账号长度至少五位'))
+  // }
+// }
 
 let isLoading = ref(false) //登录按钮的loading
 const ruleFormRef = ref(null)
 const rules = reactive({
   username: [
     //validator:自定义校验规则
-    { trigger: 'change', validator: validatorUserName },
+    // { require:true,trigger: 'blur', validator: validatorUserName },
+    { required: true, message: '请输入用户名', trigger: 'blur' },
   ],
   password: { required: true, message: '请输入密码', trigger: 'blur' },
 })
 
 let loginForm = reactive({
   username: 'admin',
-  password: '111111',
+  password: 'atguigu123',
 })
 
 const login = async () => {
@@ -86,7 +88,11 @@ const login = async () => {
     isLoading.value = false
     //登陆成功
     await useStore.userLogin(loginForm)
-    $router.push('/')
+    //编程式路由导航跳转到对应数据页
+    let redirect:any = $route.query.redirect
+    console.log(redirect)
+    $router.push({path:redirect || '/'})
+
     ElNotification({
       type: 'success',
       message: '欢迎回来',

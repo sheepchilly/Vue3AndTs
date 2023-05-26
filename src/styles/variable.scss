@@ -2,12 +2,19 @@
 
 //左侧菜单的宽度
 $base-menu-width:260px;
+//左侧菜单折叠起来的宽度
+$base-menu-min-width:48px;
 //左侧菜单背景颜色
-$base-menu-background:#787785; //#001529;
+$base-menu-background:#001529; //#001529;
 //顶部导航的高度
 $base-tabbar-height:50px;
+//顶部导航的背景颜色
+$base-tabbar-backgorundColor:white;
 
 //左侧菜单logo高度设置
 $base-menu-logo-height:50px;
 //左侧菜单logo右侧文字的大小
 $base-logo-title-fontSize:20px;
+
+//主体背景颜色
+$base-main-backgroundColor:white;

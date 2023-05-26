@@ -20,6 +20,9 @@ import globalComponent from '@/components/index.ts'
 //引入模板的全局样式
 import '@/styles/index.scss'
 
+//引入路由鉴权文件
+import './permission'
+
 createApp(App)
   .use(ElementPlus, {
     locale: zhCn, //element-plus国际化的配置

@@ -1,13 +1,21 @@
 <template>
   <div class="logo" v-if="setting.logoHiddebn">
     <img :src="setting.logo" class="logo_img" />
-    <p>{{ setting.title }}</p>
+    <p v-show="!LayOutSettingStore.fold" style="color:white">{{ setting.title }}</p>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import setting from '../../setting'
+import useLayOutSettingStore from '@/store/modules/setting'
+let LayOutSettingStore = useLayOutSettingStore()
+</script>
+
+<script>
+export default{
+  name:"Logo"
+}
 </script>
 
 <style lang="scss" scoped>
@@ -15,8 +23,8 @@ import setting from '../../setting'
   width: 100%;
   height: $base-menu-logo-height;
   display: flex;
-  justify-content: center;
   align-items: center;
+  // padding: 6px;
   .logo_img {
     width: 40px;
     height: 40px;
