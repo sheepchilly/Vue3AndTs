@@ -1,14 +1,20 @@
 // 用户相关接口
 
 import request from '@/utils/request'
-import type { loginFormData,loginResponseData,userInfoReponseData } from './types'
+import type {
+  loginFormData,
+  loginResponseData,
+  userInfoReponseData,
+} from './types'
 
 enum API {
   LOGIN_URL = '/admin/acl/index/login',
   USERINFO_URL = '/admin/acl/index/info',
-  LOGOUT_URL = '/admin/acl/index/logout'
+  LOGOUT_URL = '/admin/acl/index/logout',
 }
 
-export const reqLogin = (data:loginFormData)=> request.post<any,loginResponseData>(API.LOGIN_URL,data)
-export const reqUserInfo = ()=>request.get<userInfoReponseData>(API.USERINFO_URL)
-export const reqLogout = ()=>request.post<any>(API.LOGOUT_URL)
+export const reqLogin = (data: loginFormData) =>
+  request.post<any, loginResponseData>(API.LOGIN_URL, data)
+export const reqUserInfo = () =>
+  request.get<userInfoReponseData>(API.USERINFO_URL)
+export const reqLogout = () => request.post<any>(API.LOGOUT_URL)

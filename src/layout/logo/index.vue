@@ -1,7 +1,9 @@
 <template>
   <div class="logo" v-if="setting.logoHiddebn">
     <img :src="setting.logo" class="logo_img" />
-    <p v-show="!LayOutSettingStore.fold" style="color:white">{{ setting.title }}</p>
+    <p v-show="!LayOutSettingStore.fold" style="color: white">
+      {{ setting.title }}
+    </p>
   </div>
 </template>
 
@@ -13,8 +15,8 @@ let LayOutSettingStore = useLayOutSettingStore()
 </script>
 
 <script>
-export default{
-  name:"Logo"
+export default {
+  name: 'Logo',
 }
 </script>
 

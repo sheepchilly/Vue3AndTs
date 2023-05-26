@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { ref,watch,nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import useLayOutSettingStore from '@/store/modules/setting'
 let layOutSettingStore = useLayOutSettingStore()
 
@@ -17,20 +17,22 @@ let layOutSettingStore = useLayOutSettingStore()
 let flag = ref(true)
 
 //监听仓库内部数据是否发生变化，如果发生变化，说明用户点击过刷新按钮
-watch(()=>layOutSettingStore.refsh,()=>{
-  //点击刷新按钮：路由组件需要销毁
-  flag.value = false
-  //DOM更新后再让flag变回true
-  nextTick(()=>{
-    flag.value = true
-  })
-})
-
+watch(
+  () => layOutSettingStore.refsh,
+  () => {
+    //点击刷新按钮：路由组件需要销毁
+    flag.value = false
+    //DOM更新后再让flag变回true
+    nextTick(() => {
+      flag.value = true
+    })
+  },
+)
 </script>
 
 <script>
-export default{
-  name:"Main"
+export default {
+  name: 'Main',
 }
 </script>
 

@@ -1,14 +1,14 @@
 <template>
   <div class="layout_container">
     <!-- 左侧菜单 -->
-    <div class="layout_slider" >
+    <div class="layout_slider">
       <Logo />
       <!-- 展示菜单 -->
       <!-- 滚动组件 -->
       <el-scrollbar class="scrollbar">
         <!-- 菜单组件 -->
         <el-menu
-          :collapse="LayOutSettingStore.fold?true:false"
+          :collapse="LayOutSettingStore.fold ? true : false"
           background-color="$base-menu-background"
           text-color="white"
           :default-active="$route.path"
@@ -18,11 +18,17 @@
       </el-scrollbar>
     </div>
     <!-- 顶部导航 -->
-    <div class="layout_tabbar" :class="{fold:LayOutSettingStore.fold?true:false}">
+    <div
+      class="layout_tabbar"
+      :class="{ fold: LayOutSettingStore.fold ? true : false }"
+    >
       <Tabbar />
     </div>
     <!-- 内容展示区 -->
-    <div class="layout_main" :class="{fold:LayOutSettingStore.fold?true:false}">
+    <div
+      class="layout_main"
+      :class="{ fold: LayOutSettingStore.fold ? true : false }"
+    >
       <Main />
     </div>
   </div>
@@ -42,12 +48,11 @@ let userStore = useUserStore()
 let LayOutSettingStore = useLayOutSettingStore()
 
 const $route = useRoute()
-
 </script>
 
 <script>
-export default{
-  name:"Layout"
+export default {
+  name: 'Layout',
 }
 </script>
 
@@ -62,8 +67,8 @@ export default{
     height: 100vh;
     background: skyblue;
     background: $base-menu-background;
-    transition: width .3s ease;
-    &.fold{
+    transition: width 0.3s ease;
+    &.fold {
       width: $base-menu-min-width;
     }
     .scrollbar {
@@ -83,10 +88,10 @@ export default{
     top: 0;
     left: $base-menu-width;
     color: black;
-    transition: all .3s ease;
-    &.fold{
+    transition: all 0.3s ease;
+    &.fold {
       width: calc(100vw - $base-menu-min-width);
-      left:$base-menu-min-width;
+      left: $base-menu-min-width;
     }
   }
   .layout_main {
@@ -98,11 +103,11 @@ export default{
     top: $base-tabbar-height;
     padding: 20px;
     overflow: auto;
-    background:$base-main-backgroundColor;
-    transition: all .3s ease;
-    &.fold{
+    background: $base-main-backgroundColor;
+    transition: all 0.3s ease;
+    &.fold {
       width: calc(100vw - $base-menu-min-width);
-      left:$base-menu-min-width;
+      left: $base-menu-min-width;
     }
   }
 }

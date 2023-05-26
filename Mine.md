@@ -1775,11 +1775,9 @@ const validatorUserName = (_:any,value:any,callback:any)=>{
 
 ## 4.Token
 
-**思路：**登录成功后服务器派发了Token，并且客户端存在了Pinia中。再次向服务器发请求获取用户数据的时候，需要在请求头中带上Token
+**思路：**登录成功后服务器派发了 Token，并且客户端存在了 Pinia 中。再次向服务器发请求获取用户数据的时候，需要在请求头中带上 Token
 
-所有的token都是这么玩的！通过请求头携带公共参数，去拿对应这个用户下的所有数据
-
-
+所有的 token 都是这么玩的！通过请求头携带公共参数，去拿对应这个用户下的所有数据
 
 # 六.首页
 
@@ -2008,15 +2006,15 @@ meta: {
 
 在 layout 中封装成组件 tabbar，然后再把 tabbar 中的左边和右边拆成两个子组件
 
-### 4.1左侧图标样式切换
+### 4.1 左侧图标样式切换
 
 **思路：**使用<component>组件+三目运算符控制图标样式切换
 
-1.给breadcrumb中index.vue中的<el-icon>绑定点击事件 @click="changeIcon"
+1.给 breadcrumb 中 index.vue 中的<el-icon>绑定点击事件 @click="changeIcon"
 
 2.定义一个响应式数据控制图标的切换 => let fold = ref(false)
 
-3.使用component动态的控制组件展示 => <component :is="" />
+3.使用 component 动态的控制组件展示 => <component :is="" />
 
 ```js
 <el-icon style="margin-right: 20px" @click="changeIcon">
@@ -2031,29 +2029,29 @@ const changeIcon = ()=>{
 }
 ```
 
-4.根据fold的值为true或false来决定侧边栏宽度要不要发生变化。因为fold的值不仅当前组件需要使用，祖先组件也需要，所以将fold的值存在仓库中，方便组件间通信
+4.根据 fold 的值为 true 或 false 来决定侧边栏宽度要不要发生变化。因为 fold 的值不仅当前组件需要使用，祖先组件也需要，所以将 fold 的值存在仓库中，方便组件间通信
 
 ```js
 //在store下的modules中新建setting.ts文件，用于存放layout组件相关的数据
-import {defineStore} from 'pinia'
-let useLayOutSettingStore = defineStore('SettingStore',{
-    state:()=>{
-        return{
-            fold:false, //用于控制菜单折叠还是收起的控制
-        }
-    },
-    actions:{
-        changeIconAction(){
-            this.fold = ! this.fold
-        }
+import { defineStore } from 'pinia'
+let useLayOutSettingStore = defineStore('SettingStore', {
+  state: () => {
+    return {
+      fold: false, //用于控制菜单折叠还是收起的控制
     }
+  },
+  actions: {
+    changeIconAction() {
+      this.fold = !this.fold
+    },
+  },
 })
 export default useLayOutSettingStore
 
 //在需要使用数据的组件中引入仓库，在回调函数中调用仓库actions中的方法
 import useLayOutSettingStore from '@/store/modules/setting'
 let LayOutSettingStore = useLayOutSettingStore()
-const changeIcon = ()=>{
+const changeIcon = () => {
   LayOutSettingStore.changeIconAction()
 }
 ```
@@ -2062,9 +2060,9 @@ const changeIcon = ()=>{
 
 **思路：**
 
-- 根据仓库中fold的true或false，动态的给侧边栏追加类名，使用三目运算符判断仓库中的fold属性为true或false，来控制侧边栏的折叠与展开
-- 侧边栏头顶文字在logo文件夹下，使用v-show和仓库中fold为true或false来控制它的显示与隐藏
-- 给侧边栏的展开与折叠追加动画效果 -> 只需要给侧边栏的css添加：transition: width .3s ease;
+- 根据仓库中 fold 的 true 或 false，动态的给侧边栏追加类名，使用三目运算符判断仓库中的 fold 属性为 true 或 false，来控制侧边栏的折叠与展开
+- 侧边栏头顶文字在 logo 文件夹下，使用 v-show 和仓库中 fold 为 true 或 false 来控制它的显示与隐藏
+- 给侧边栏的展开与折叠追加动画效果 -> 只需要给侧边栏的 css 添加：transition: width .3s ease;
 
 ```js
 //layout index.vue中
@@ -2083,14 +2081,14 @@ let LayOutSettingStore = useLayOutSettingStore()
     width: $base-menu-min-width;
 }
 </stype>
-    
+
 //logo index.vue
 <p v-show="!LayOutSettingStore.fold">{{ setting.title }}</p>
 import useLayOutSettingStore from '@/store/modules/setting'
 let LayOutSettingStore = useLayOutSettingStore()
 ```
 
-- 同时顶部tabbar和内容main区域也要根据页面的缩放来调整自己的大小
+- 同时顶部 tabbar 和内容 main 区域也要根据页面的缩放来调整自己的大小
 
 ```js
 <div class="layout_tabbar" :class="{fold:LayOutSettingStore.fold?true:false}">
@@ -2105,13 +2103,13 @@ let LayOutSettingStore = useLayOutSettingStore()
 </style>
 ```
 
-- 侧边栏折叠起来时文字缩放不自然 -> 解决：取消动态类名的fold的添加，直接让顶部导航和主体部分压住侧边栏。
+- 侧边栏折叠起来时文字缩放不自然 -> 解决：取消动态类名的 fold 的添加，直接让顶部导航和主体部分压住侧边栏。
 
-### 4.3面包屑根据路由变化
+### 4.3 面包屑根据路由变化
 
-**思路：**tabbar动态的展示和匹配侧边栏的一二级路由的组件名字和图标，使用vue-router提供的matched实现面包屑功能 *`this.$route.matched`*
+**思路：**tabbar 动态的展示和匹配侧边栏的一二级路由的组件名字和图标，使用 vue-router 提供的 matched 实现面包屑功能 _`this.$route.matched`_
 
-1.面包屑动态的展示路由 -> 使用路由对象 -> 里面有一个matched属性，可以获取到当前的路由（无论一级二级还是三级） -> v-for="(item,index) in $route.matched"
+1.面包屑动态的展示路由 -> 使用路由对象 -> 里面有一个 matched 属性，可以获取到当前的路由（无论一级二级还是三级） -> v-for="(item,index) in $route.matched"
 
 ```js
   <el-breadcrumb separator-icon="ArrowRight">
@@ -2125,17 +2123,17 @@ let LayOutSettingStore = useLayOutSettingStore()
   </el-breadcrumb>
 ```
 
-2.点击面包屑的每一项也可以进行路由跳转，只需要使用自带的 to属性 -> :to="item.path"
+2.点击面包屑的每一项也可以进行路由跳转，只需要使用自带的 to 属性 -> :to="item.path"
 
-3.点击二级路由面包屑的一级路由，就重定向到一级路由，在routes中配置redirect ->   redirect:"/acl/user"
+3.点击二级路由面包屑的一级路由，就重定向到一级路由，在 routes 中配置 redirect -> redirect:"/acl/user"
 
-### 4.4点击按钮刷新页面
+### 4.4 点击按钮刷新页面
 
 **思路：**点击刷新按钮后会重新向服务器发请求获取数据，也就是当你点击刷新按钮的时候实际上是销毁二级路由组件再重新创建
 
-1.在Tabbar组件下的Setting中点击按钮，要通知Main组件刷新数据，涉及叔侄组件间通信，所以把数据放到仓库当中，每当这个属性值发生变化时，叔叔组件就可以监听到
+1.在 Tabbar 组件下的 Setting 中点击按钮，要通知 Main 组件刷新数据，涉及叔侄组件间通信，所以把数据放到仓库当中，每当这个属性值发生变化时，叔叔组件就可以监听到
 
-- 在setting仓库中添加一个属性refsh，每次一点击按钮的时候就把该属性置反
+- 在 setting 仓库中添加一个属性 refsh，每次一点击按钮的时候就把该属性置反
 
 ```js
 //setting.js仓库
@@ -2156,20 +2154,23 @@ const updateRefsh = ()=>{
 }
 ```
 
-- Main组件上监听仓库state的refsh数据的变化，refsh一变化就重新向服务器发请求（watch第一个参数要写成回调函数形式）
+- Main 组件上监听仓库 state 的 refsh 数据的变化，refsh 一变化就重新向服务器发请求（watch 第一个参数要写成回调函数形式）
 
 ```js
 //main index.vue
-import { ref,watch } from 'vue'
+import { ref, watch } from 'vue'
 import useLayOutSettingStore from '@/store/modules/setting'
 let layOutSettingStore = useLayOutSettingStore()
 
-watch(()=>layOutSettingStore.refsh,()=>{
-  console.log('我变了！')
-})
+watch(
+  () => layOutSettingStore.refsh,
+  () => {
+    console.log('我变了！')
+  },
+)
 ```
 
-- **v-if可以销毁创建组件**，定义一个变量控制组件是否销毁，然后使用nextTick监听数据发生变化，让他看看DOM是否更新完毕 - **nextTick**:当响应式数据发生变化后，立刻获取到更新后的DOM
+- **v-if 可以销毁创建组件**，定义一个变量控制组件是否销毁，然后使用 nextTick 监听数据发生变化，让他看看 DOM 是否更新完毕 - **nextTick**:当响应式数据发生变化后，立刻获取到更新后的 DOM
 
 ```js
 //main index.vue
@@ -2188,36 +2189,36 @@ watch(()=>layOutSettingStore.refsh,()=>{
 })
 ```
 
-### 4.5点击按钮切换全屏模式
+### 4.5 点击按钮切换全屏模式
 
-**思路：**点击按钮后修改DOM样式
+**思路：**点击按钮后修改 DOM 样式
 
-DOM中有一个属性：document.fullscreenElement来判断当前是否全屏，是的话返回true，否则返回null
+DOM 中有一个属性：document.fullscreenElement 来判断当前是否全屏，是的话返回 true，否则返回 null
 
 以及一个方法：requestFullscreen，实现全屏模式 -> document.documentElement.requestFulscreen() ，以及退出全屏模式的方法 -> document.exitFullscreen()
 
 ```js
 //刷新按钮点击的回调
-const updateRefsh = ()=>{
+const updateRefsh = () => {
   layOutSettingStore.refsh = !layOutSettingStore.refsh
 }
 //全屏按钮点击的回调
-const fullScreen = ()=>{
+const fullScreen = () => {
   //document.fullscreenElement:DOM对象的一个属性，可以用来判断当前是不是全屏模式
   let full = document.fullscreenElement
-  if(!full){
+  if (!full) {
     //文档根节点的方法 requestFullscreen，实现全屏模式
     document.documentElement.requestFullscreen()
-  }else{
+  } else {
     //退出全屏模式
     document.exitFullscreen()
   }
 }
 ```
 
-### 4.6下拉菜单退出登录
+### 4.6 下拉菜单退出登录
 
-**思路：**1.退出登录的时候，向服务器发请求，告诉服务器本次登录的Token不需要了，下次登录再重新生成一个新Token。 2.清空Pinia中用户相关的数据  3.路由跳转 => 以上直接定义一个方法，一点击就调用Pinia中的该方法
+**思路：**1.退出登录的时候，向服务器发请求，告诉服务器本次登录的 Token 不需要了，下次登录再重新生成一个新 Token。 2.清空 Pinia 中用户相关的数据 3.路由跳转 => 以上直接定义一个方法，一点击就调用 Pinia 中的该方法
 
 ```js
 //setting index.vue
@@ -2238,38 +2239,36 @@ userLogOut(){
 //REMOVE_TOKEN是封装的独立函数，用来清除token
 ```
 
-**问题：**在当前路由点击退出登录后，再登录时应该是退出登录之前的页面。（也可以回到首页，但是这里做的是保留路由）所以分两种情况：①path中带着query参数就跳转回query参数的路径  ②path中没有query参数就跳回首页
+**问题：**在当前路由点击退出登录后，再登录时应该是退出登录之前的页面。（也可以回到首页，但是这里做的是保留路由）所以分两种情况：①path 中带着 query 参数就跳转回 query 参数的路径 ②path 中没有 query 参数就跳回首页
 
-**解决：**把当前路由的路径通过query参数带给Login，这样当你再点击登录按钮的时候，就可以回到之前的路由页面了。使用router.push跳转的时候可以携带query参数 -> 只要是路由上的路径，组件vc都可以拿到
+**解决：**把当前路由的路径通过 query 参数带给 Login，这样当你再点击登录按钮的时候，就可以回到之前的路由页面了。使用 router.push 跳转的时候可以携带 query 参数 -> 只要是路由上的路径，组件 vc 都可以拿到
 
 ![image-20230525172330716](C:\Users\13459\AppData\Roaming\Typora\typora-user-images\image-20230525172330716.png)
 
-
-
-那么**问题**又来了：怎么样拿出来redirect的path呢？ -> 先创建路由信息对象 let $route = useRoute() -> 然后使用$route.query可以拿到路由当中的query信息，因为传递的时候给query添加了redirect前缀，所以可以通过$route.query.redirect拿到路径信息
+那么**问题**又来了：怎么样拿出来 redirect 的 path 呢？ -> 先创建路由信息对象 let $route = useRoute() -> 然后使用$route.query 可以拿到路由当中的 query 信息，因为传递的时候给 query 添加了 redirect 前缀，所以可以通过$route.query.redirect 拿到路径信息
 
 ```js
 //setting index.vue
-const logout = ()=>{
+const logout = () => {
   userStore.userLogOut()
-  $router.push({path:'/login',query:{redirect:$route.path}})
+  $router.push({ path: '/login', query: { redirect: $route.path } })
 }
 
 //login index.vue
-import { useRouter,useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 let $route = useRoute()
 //在login的回调中
-let redirect:any = $route.query.redirect
-$router.push({path:redirect || '/'})
+let redirect: any = $route.query.redirect
+$router.push({ path: redirect || '/' })
 ```
 
-又有**问题**了：①登录之后就不能再访问login了（用全局守卫判断能不能跳转） ②使用query跳转回来后，用户的头像和昵称没有了（仓库持久化存储(tips:这里没有用持久化，而是用的前置路由守卫，只要酷路由一发生变化，要是仓库中没有用户信息，就调用仓库中的方法重新向服务器发请求获取用户信息，所以可以保证从首页跳转到别的页面后用户信息丢失的问题！！)+目前只有首页获取用户信息，可以把请求放在路由守卫里，只要路由一跳转，守卫就干活）③每一次路由跳转的时候还需要有进度条  ④token要是设置了有效期，在有效期结束之后，用户再点击侧边栏的话应该跳转回Login页面（路由守卫解决）
+又有**问题**了：① 登录之后就不能再访问 login 了（用全局守卫判断能不能跳转） ② 使用 query 跳转回来后，用户的头像和昵称没有了（仓库持久化存储(tips:这里没有用持久化，而是用的前置路由守卫，只要酷路由一发生变化，要是仓库中没有用户信息，就调用仓库中的方法重新向服务器发请求获取用户信息，所以可以保证从首页跳转到别的页面后用户信息丢失的问题！！)+目前只有首页获取用户信息，可以把请求放在路由守卫里，只要路由一跳转，守卫就干活）③ 每一次路由跳转的时候还需要有进度条 ④token 要是设置了有效期，在有效期结束之后，用户再点击侧边栏的话应该跳转回 Login 页面（路由守卫解决）
 
-①路由访问权限设置 - 用Token判断用户登录与否 - permission.ts
+① 路由访问权限设置 - 用 Token 判断用户登录与否 - permission.ts
 
--用户未登录可以访问login，其余的路由不能访问（都会重定向到login）
+-用户未登录可以访问 login，其余的路由不能访问（都会重定向到 login）
 
--用户登录成功后，不可以访问login，指向首页，其余的路由都可以访问
+-用户登录成功后，不可以访问 login，指向首页，其余的路由都可以访问
 
 -在组件外获取仓库的数据时需要**注意**：使用同步无法直接获取到仓库的数据，获取小仓库的数据首先需要有大仓库，所以实例化的时候要传入大仓库
 
@@ -2279,49 +2278,48 @@ import useUserStore from './store/modules/user'
 import pinia from './store'
 let userStore = useUserStore(pinia)
 
-router.beforeEach(async (to:any,from:any,next:any)=>{
-    nprogress.start()
-    //获取token，去判断用户登录还是未登录
-    let token = userStore.token
-    //获取用户名字
-    let username = userStore.username
-    if(token){
-        //登录成功，用户访问login，不能访问，指向首页
-        if(to.path =='/login'){
-            next({path:"/"})
-        }else{
-            //登录成功后可以访问除了登录以外的其他路由
-            //用用户信息直接放行
-            if(username){
-                next()
-            }else{
-                //没有用户信息就向服务器发请求获取用户信息后再放行 
-                try{
-                    await userStore.userInfo()
-                    next()
-                }catch(error){
-                    //什么情况下会走catch分支？ 1.token过期，获取不到用户信息 2.用户手动修改本地存储token
-                    //1.token过期先退出登录 - 把用户信息清空,回到login页面
-                    userStore.userLogOut()
-                    next({path:'/login',query:{redirect:to.path}})
-                }
-            }
+router.beforeEach(async (to: any, from: any, next: any) => {
+  nprogress.start()
+  //获取token，去判断用户登录还是未登录
+  let token = userStore.token
+  //获取用户名字
+  let username = userStore.username
+  if (token) {
+    //登录成功，用户访问login，不能访问，指向首页
+    if (to.path == '/login') {
+      next({ path: '/' })
+    } else {
+      //登录成功后可以访问除了登录以外的其他路由
+      //用用户信息直接放行
+      if (username) {
+        next()
+      } else {
+        //没有用户信息就向服务器发请求获取用户信息后再放行
+        try {
+          await userStore.userInfo()
+          next()
+        } catch (error) {
+          //什么情况下会走catch分支？ 1.token过期，获取不到用户信息 2.用户手动修改本地存储token
+          //1.token过期先退出登录 - 把用户信息清空,回到login页面
+          userStore.userLogOut()
+          next({ path: '/login', query: { redirect: to.path } })
         }
-    }else{
-        if(to.path == '/login'){
-            next()
-        }else{
-            //未登录的情况下在地址栏输入的地址，因为没有token所以去不了，但是会保留用户的输入
-            next({path:"/login",query:{redirect:to.path}})
-        }
+      }
     }
+  } else {
+    if (to.path == '/login') {
+      next()
+    } else {
+      //未登录的情况下在地址栏输入的地址，因为没有token所以去不了，但是会保留用户的输入
+      next({ path: '/login', query: { redirect: to.path } })
+    }
+  }
 })
-
 ```
 
-③每一次路由切换的时候都需要有进度条
+③ 每一次路由切换的时候都需要有进度条
 
--使用全局前置路由守卫+nprogress插件
+-使用全局前置路由守卫+nprogress 插件
 
 ```js
 //安装nprogress npm i nprogress
@@ -2330,13 +2328,11 @@ import nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
 
 //在前置路由守卫里使用
-router.beforeEach((to,from,next)=>{
-    nprogress.start() //进度条开始
-    next()
+router.beforeEach((to, from, next) => {
+  nprogress.start() //进度条开始
+  next()
 })
 ```
-
-
 
 # 七.接口配置
 
@@ -2344,7 +2340,7 @@ router.beforeEach((to,from,next)=>{
 
 ## 1.loadEnv
 
-- vite服务器提供了一个方法：loadEnv，当这个方法一执行，会返回当前开发环境对象，环境对象身上包含着当前环境变量身上配置的变量
+- vite 服务器提供了一个方法：loadEnv，当这个方法一执行，会返回当前开发环境对象，环境对象身上包含着当前环境变量身上配置的变量
 
 ```js
 //引入loadEnv
@@ -2356,7 +2352,7 @@ export default defineConfig(({ command,mode }) => {
 
 ## 2.server.proxy
 
-详情看Vite官网的配置信息，下面这个 [env.VITE_APP_BASE_API] 是全局开发环境中的变量.env.development
+详情看 Vite 官网的配置信息，下面这个 [env.VITE_APP_BASE_API] 是全局开发环境中的变量.env.development
 
 ```js
     //代理跨域
@@ -2373,19 +2369,19 @@ export default defineConfig(({ command,mode }) => {
 
 ## 3.登录/用户信息/退出登录 接口
 
-1.重写api下user接口的数据，把mock的假接口换成真接口
+1.重写 api 下 user 接口的数据，把 mock 的假接口换成真接口
 
-2.因为mock中数据的格式跟真实接口返回的数据格式不一样，所以还要修改仓库中的数据格式
+2.因为 mock 中数据的格式跟真实接口返回的数据格式不一样，所以还要修改仓库中的数据格式
 
-3.点击退出登陆如果成功要跳转到Login，如果退出登录失败，要弹出相应的错误提示信息。**如何知道**登录请求是否成功还是失败？-> 在仓库中对应的actions中return "ok"或者return Promise.reject(new Error(result.message))
+3.点击退出登陆如果成功要跳转到 Login，如果退出登录失败，要弹出相应的错误提示信息。**如何知道**登录请求是否成功还是失败？-> 在仓库中对应的 actions 中 return "ok"或者 return Promise.reject(new Error(result.message))
 
-4.**遇到的问题：**点击登录之后数据回来了但是路由没有跳转 -> 该问题是因为：Pinia仓库中的token和username在点击登录后没有拿到（解决了） -> 我真服了你在actions中发登录请求的时候直接let而不是存在仓库中，所以这个token一直为null搞得路由守卫不让你进去我真服了你还百度了半天Pinia异步我真服了
+4.**遇到的问题：**点击登录之后数据回来了但是路由没有跳转 -> 该问题是因为：Pinia 仓库中的 token 和 username 在点击登录后没有拿到（解决了） -> 我真服了你在 actions 中发登录请求的时候直接 let 而不是存在仓库中，所以这个 token 一直为 null 搞得路由守卫不让你进去我真服了你还百度了半天 Pinia 异步我真服了
 
-### 3.1接口类型重写
+### 3.1 接口类型重写
 
-把之前mock的接口类型全部重写
+把之前 mock 的接口类型全部重写
 
-1.用户登录接口携带参数的ts类型
+1.用户登录接口携带参数的 ts 类型
 
 ```js
 export interface loginFormData{
@@ -2398,29 +2394,29 @@ export const reqLogin = (data:loginFormData)=> request.post<any,loginResponseDat
 
 ```
 
-2.全部接口返回数据都拥有ts类型
+2.全部接口返回数据都拥有 ts 类型
 
 ```js
-export interface ResponseData{
-  code:number,
-  message:string,
-  ok:boolean
+export interface ResponseData {
+  code: number;
+  message: string;
+  ok: boolean;
 }
 ```
 
-3.登录接口返回的数据类型（继承自全部接口的类型以外，还有自己的类型data）
+3.登录接口返回的数据类型（继承自全部接口的类型以外，还有自己的类型 data）
 
 ```js
-export interface loginResponseData extends ResponseData{
-  data:string
+export interface loginResponseData extends ResponseData {
+  data: string;
 }
 ```
 
-4.退出接口的类型返回为null，可以直接定义为any类型
+4.退出接口的类型返回为 null，可以直接定义为 any 类型
 
-### 3.2修改仓库中数据类型
+### 3.2 修改仓库中数据类型
 
-使用api下的user里types.ts定义好的接口类型
+使用 api 下的 user 里 types.ts 定义好的接口类型
 
 ```js
 import type { loginFormData,loginResponseData,userInfoReponseData } from '@/api/user/types'

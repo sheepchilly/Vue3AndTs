@@ -48,7 +48,7 @@ import { User, Lock } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import useUserStore from '@/store/modules/user'
-import { useRouter,useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { getTime } from '@/utils/time'
 
 let $router = useRouter()
@@ -57,12 +57,12 @@ let useStore = useUserStore()
 
 //自定义校验规则
 // const validatorUserName = (_: any, value: any, callback: any) => {
-  //rule为数组的校验规则对象,value为表单校验的文本内容,callback是一个函数，如果符合条件callBack会放行
-  // if (/^\d{4,10}$/.test(value)) {
-  //   callback()
-  // } else {
-  //   callback(new Error('账号长度至少五位'))
-  // }
+//rule为数组的校验规则对象,value为表单校验的文本内容,callback是一个函数，如果符合条件callBack会放行
+// if (/^\d{4,10}$/.test(value)) {
+//   callback()
+// } else {
+//   callback(new Error('账号长度至少五位'))
+// }
 // }
 
 let isLoading = ref(false) //登录按钮的loading
@@ -89,9 +89,9 @@ const login = async () => {
     //登陆成功
     await useStore.userLogin(loginForm)
     //编程式路由导航跳转到对应数据页
-    let redirect:any = $route.query.redirect
+    let redirect: any = $route.query.redirect
     console.log(redirect)
-    $router.push({path:redirect || '/'})
+    $router.push({ path: redirect || '/' })
 
     ElNotification({
       type: 'success',

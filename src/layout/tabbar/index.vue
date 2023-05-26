@@ -17,8 +17,8 @@ import Setting from './setting/index.vue'
 </script>
 
 <script>
-export default{
-  name:"Tabbar"
+export default {
+  name: 'Tabbar',
 }
 </script>
 

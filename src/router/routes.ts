@@ -51,7 +51,7 @@ export const constantRoute = [
       icon: 'Setting',
     },
     //此处重定向是因为面包屑需要重定向
-    redirect:"/acl/user",
+    redirect: '/acl/user',
     children: [
       {
         path: '/acl/user',
@@ -95,7 +95,7 @@ export const constantRoute = [
       icon: 'Goods',
     },
     //此处重定向是因为面包屑需要重定向
-    redirect:"/product/trademark",
+    redirect: '/product/trademark',
     children: [
       {
         path: '/product/trademark',

@@ -1,9 +1,9 @@
 //对于axios进行二次封装，封装的目的是请求与相应拦截器
 
-import axios, { Axios, AxiosResponse, AxiosRequestConfig } from "axios";
+import axios, { Axios, AxiosResponse, AxiosRequestConfig } from 'axios'
 import { ElMessage } from 'element-plus'
 import useUserStore from '@/store/modules/user'
-import {GET_TOKEN} from './token'
+import { GET_TOKEN } from './token'
 
 //解决user仓库中result.code报错 类型“AxiosResponse<any, any>”上不存在属性“code”。(不生效)
 // declare module "axios" {
@@ -25,9 +25,9 @@ let request = axios.create({
 //第二步：请求拦截器
 request.interceptors.request.use((config) => {
   let userStore = useUserStore()
-  if(userStore.token){
+  if (userStore.token) {
     config.headers.token = GET_TOKEN()
-  }  
+  }
   //返回配置对象
   return config
 })

@@ -1,12 +1,24 @@
 <template>
-  <el-button type="" size="small" icon="Refresh" circle @click="updateRefsh"></el-button>
-  <el-button type="" size="small" icon="FullScreen" circle @click="fullScreen"></el-button>
+  <el-button
+    type=""
+    size="small"
+    icon="Refresh"
+    circle
+    @click="updateRefsh"
+  ></el-button>
+  <el-button
+    type=""
+    size="small"
+    icon="FullScreen"
+    circle
+    @click="fullScreen"
+  ></el-button>
   <el-button type="" size="small" icon="Setting" circle></el-button>
   <img :src="userStore.avatar" class="right_img" />
   <!-- 下拉菜单 -->
   <el-dropdown>
     <span class="el-dropdown-link">
-      <span>{{userStore.username}}</span>
+      <span>{{ userStore.username }}</span>
       <el-icon class="el-icon--right">
         <arrow-down />
       </el-icon>
@@ -20,7 +32,7 @@
 </template>
 
 <script setup>
-import { useRouter,useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import useLayOutSettingStore from '@/store/modules/setting'
 import useUserStore from '@/store/modules/user'
 
@@ -31,32 +43,31 @@ let $router = useRouter()
 let $route = useRoute()
 
 //刷新按钮点击的回调
-const updateRefsh = ()=>{
+const updateRefsh = () => {
   layOutSettingStore.refsh = !layOutSettingStore.refsh
 }
 //全屏按钮点击的回调
-const fullScreen = ()=>{
+const fullScreen = () => {
   //document.fullscreenElement:DOM对象的一个属性，可以用来判断当前是不是全屏模式
   let full = document.fullscreenElement
-  if(!full){
+  if (!full) {
     //文档根节点的方法 requestFullscreen，实现全屏模式
     document.documentElement.requestFullscreen()
-  }else{
+  } else {
     //退出全屏模式
     document.exitFullscreen()
   }
 }
 
-const logout = async ()=>{
+const logout = async () => {
   await userStore.userLogOut()
-  $router.push({path:'/login',query:{redirect:$route.path}})
+  $router.push({ path: '/login', query: { redirect: $route.path } })
 }
-
 </script>
 
 <script>
-export default{
-  name:'Setting'
+export default {
+  name: 'Setting',
 }
 </script>
 
