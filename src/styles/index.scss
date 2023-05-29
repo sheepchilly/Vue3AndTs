@@ -6,10 +6,10 @@
     width: 10px;
 }
 ::-webkit-scrollbar-track{ //滚动条颜色
-    background:#787785 ;
+    background:white ;
 }
 ::-webkit-scrollbar-thumb{ 
-    width: 3px;
-    background: yellow; //小的滚动条颜色
-    border-radius: 19px;
+    width: 2px;
+    background: #409EFF; //小的滚动条颜色
+    border-radius: 15px;
 }

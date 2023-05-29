@@ -5,15 +5,6 @@ import { ElMessage } from 'element-plus'
 import useUserStore from '@/store/modules/user'
 import { GET_TOKEN } from './token'
 
-//解决user仓库中result.code报错 类型“AxiosResponse<any, any>”上不存在属性“code”。(不生效)
-// declare module "axios" {
-//   interface AxiosResponse<T = any> {
-//     code:number,
-//     message:string,
-//     ok:boolean
-//   }
-//   export function create(config?: AxiosRequestConfig): AxiosInstance;
-// }
 
 //第一步：利用axios的create方法，去创建axios实例 - axios实例：可以配置请求的基础地址，请求超时时间
 let request = axios.create({

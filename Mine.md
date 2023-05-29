@@ -1469,9 +1469,9 @@ export interface userResponseData {
 
 swagger 文档:
 
-http://139.198.104.58:8209/swagger-ui.html
+商品：http://39.98.123.211:8510/swagger-ui.html#/
 
-http://139.198.104.58:8212/swagger-ui.html#/
+用户：http://139.198.104.58:8212/swagger-ui.html#/
 
 echarts:国内镜像网站
 
@@ -2435,3 +2435,654 @@ let result:any = await reqLogout()
 
 - 一般都是增删改查
 - 当组件一挂载的时候需要向服务器发请求获取数据
+
+## 1.品牌管理
+
+1.组件第一次挂载时，默认请求第一页的数据，对应接口：[GET](http://39.98.123.211:8510/swagger-ui.html#!/21697292602550921475/indexUsingGET_2) [/admin/product/baseTrademark/{page}/{limit}](http://39.98.123.211:8510/swagger-ui.html#!/21697292602550921475/indexUsingGET_2)
+
+接口需要携带参数：page当前分页器第几页的数据，limit获取多少条数据
+
+**注意：**get接口的query参数如何封装和携带 **解决：**使用模板字符串
+
+```js
+enum API{
+    TRADEMARK_URL = '/admin/product/baseTrademark/',
+}
+export const reqHasTrademark = (page:number,limit:number)=>request.get<any,any>(API.TRADEMARK_URL+`${page}/${limit}`)
+```
+
+### 1.1已有品牌的类型
+
+在api下的product下的trademark下的types.ts文件
+
+**注意：**在已有品牌的ts数据类型中，已有的品牌是有id的，新增的品牌的id是需要靠数据库生成的，所以定义接口类型的时候需要用可选属性 ?: 来定义类型
+
+```js
+//参数值固定字段类型
+export interface ResponseData{
+    code:number,
+    message:string,
+    ok:boolean
+}
+
+//已有的品牌的ts数据类型
+export interface TradeMark{
+        id?:number,
+        tmName:string,
+        logUrl:string
+}
+
+//包含全部品牌的TS类型 - 已有品牌类型的数组
+export type Records = TradeMark[]
+
+//获取的已有全部品牌的数据ts类型
+export interface TradeMarkResponseData extends ResponseData{
+    data:{
+        records:Records,
+        total:number,
+        size:number,
+        current:number,
+        searchCount:boolean,
+        pages:number
+    }
+}
+```
+
+1.在api请求中使用
+
+```js
+import {TradeMarkResponseData} from './types.ts'
+
+export const reqHasTrademark = (page:number,limit:number)=>request.get<any,TradeMarkResponseData>(API.TRADEMARK_URL+`${page}/${limit}`)
+```
+
+2.在views下的trademark.vue中使用
+
+```js
+import {Records,TradeMarkResponseData} from '@/api/product/trademark/types.ts'
+
+let trademarkArr = ref<Records>([]) //类型是包含全部品牌的Ts类型
+const getHasTrademark = async () => {
+  let result: TradeMarkResponseData = await reqHasTrademark(currentPage.value, limit.value)
+```
+
+### 1.2分页器页码变化
+
+- 每次点击分页器的时候需要重新向服务器发请求获取数据 @current-change
+
+**思路：**使用elementPlus提供的分页器事件@current-change，当分页器页码发生变化后在回调里发请求.
+
+实际上@current-change就是一个组件自定义事件，它回传了当前的页码（但是目前不需要当前的页码，因为total做了双向数据绑定）所以可以直接把getHasTrademark作为事件的回调，那么@current-change就不需要额外写回调函数了
+
+```js
+<el-pagination  @current-change="getHasTrademark()" />
+```
+
+### 1.3页面展示条数发生变化
+
+- 分页器下拉菜单里当前页面展示的条数发生变化 @size-change
+
+**思路：**① 分页器下拉菜单也是element组件身上的自定义事件，也会向组件注入当前分页器的数量，但是我之前已经双向绑定收集到了当前页面展示的条数，所以只需要在回调函数中调用getHashTrademark函数。
+
+② 同时需要让当前页码回到第一页，正常可以在回调函数中写currentPage.value = 1，简化就是在getHashTrademark函数的形参中设置默认值 (page=1)=>{ currentPage.value = page }
+
+```js
+<el-pagination  @size-change="sizeChange" />
+const sizeChange = ()=>{
+	getHasTrademark()
+}
+```
+
+### 1.4品牌添加/修改
+
+- 点击添加或者编辑会弹出来一个对话框（dialog）
+- 注意dialog底部的按钮使用具名插槽 <template #footer> 来显示 
+
+#### 1.4.1新增/修改品牌共用一个方法
+
+- 新增品牌和修改品牌的区别在于 - 新增品牌不需要携带id，id由服务器生成，而修改品牌需要携带id
+- 服务器要是返回的数据只有code没有data，也就是data为null，就可以把返回值的类型断言为any
+
+```js
+//新增和修改品牌类型 - 如果data中携带id字段就是修改，否则就是新增
+export const reqAddOrUpdateTrademark = (data:TradeMark)=>{
+    if(data.id){
+        request.put<any,any>(API.ADDTRADEMARK_URL,data)
+    }else{
+        request.post<any,any>(API.UPDATETRADEMARK_URL,data)
+    }
+}
+```
+
+#### 1.4.2收集品牌名称数据
+
+**思路：**新建一个reactive变量trademarkParams，数据类型是types中定义好的tradeMark类型，然后使用v-model将数据收集到trademarkParams.tmName和trademarkParams.logoUrl中
+
+#### 1.4.3收集上传图片数据
+
+**思路：**使用<el-upload>，其中action是请求的地址，所以需要先将图片上传到服务器上，然后发请求的时候才可以拿到图片的地址
+
+1.上传图片的地址 [/admin/product/fileUpload](http://39.98.123.211:8510/swagger-ui.html#!/199782025631649297022550921475/fileUploadUsingGET)
+
+- 该地址没有/api，代理服务器不会工作，所以要在action的地址中加上/api（接口文档中是没有加的）
+- upload组件自带的API：①:show-file-list="true" -> 是否显示已上传文件列表 ②:before-upload="beforeAvatarUpload" ->可以约束上传文件的类型 ③:on-success -> 文件上传成功之后的回调，会把图片上传成功之后的地址返回
+- 图片和图标谁显示谁隐藏，需要靠trademarkParams.logUrl是否为空串来切换，当没有上传图片的时候它为空
+
+```js
+<el-upload class="avatar-uploader" action="/api/admin/product/fileUpload" :show-file-list="true"
+:on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+    <img v-if="trademarkParams.logUrl" :src="trademarkParams.logUrl" class="avatar" />
+    <el-icon v-else class="avatar-uploader-icon">
+      <Plus />
+    </el-icon>
+</el-upload>
+
+let trademarkParams = reactive<TradeMark>({
+  logUrl: "",
+  tmName: ""
+})
+//图片上传组件API->上传图片之前触发的钩子函数
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile: any) => {
+  //约束文件的类型
+  if (rawFile.type !== 'image/jpeg') {
+    ElMessage.error('Avatar picture must be JPG format!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    //约束文件的大小
+    ElMessage.error('Avatar picture size can not exceed 2MB!')
+    return false
+  }
+  return true
+}
+//图片上传成功的钩子 - response为请求成功后服务器返回的地址路径
+const handleAvatarSuccess: UploadProps['onSuccess'] = (
+  response:any
+) => {
+  trademarkParams.logUrl = response.data
+}
+```
+
+#### 1.4.4 点击确认按钮收集数据
+
+- 发请求返回的是Promise对象，所以**别忘记**加async和await
+- 添加成功后应该做什么？①弹出提示信息 ②对话框关闭 ③再捞一次已有品牌的信息 ④清空表单信息（点击取消按钮也需要清空，所以可以直接再点击添加品牌时清空，就避免了要写两次）
+
+```js
+const confirm = async () => {
+  let result:any = await reqAddOrUpdateTrademark(trademarkParams)
+  if(result.code == 200){
+    dialogFormVisible.value = false
+    ElMessage({
+      type:'success',
+      message:'添加品牌成功'
+    })
+    getHasTrademark()
+  }else{
+    ElMessage({
+      type:'error',
+      message:"添加品牌失败"
+    })
+  }
+}
+```
+
+#### 1.4.5 清空表单内容
+
+**思路：**因为在<el-dialog>对话框中无论是点击取消还是确定，都会关闭当前对话框，再次点击新增按钮的时候，对话框里面的内容应该清空，所以把清空操作放在点击添加品牌的回调中执行
+
+- <el-upload>提供了一个清空文件显示的方法clearFiles()，但是使用的时候要配合ref获取DOM节点+nextTick钩子函数使用，因为setup执行的时候页面DOM还未渲染完成，拿不到ref
+- 剩下的名称和LOGO只需要清空reactive对象中的属性即可
+
+```js
+//清除show-file-list的文件信息
+const removeImg = ()=>{
+  nextTick(()=>{
+    picUpload.value.clearFiles()
+  })
+}
+
+//添加品牌
+const addTrademark = () => {
+  dialogFormVisible.value = true
+  //清空输入框
+  removeImg()
+  trademarkParams.tmName = ''
+  trademarkParams.logoUrl = ''
+}
+```
+
+### 1.5品牌修改
+
+点击修改按钮的时候，当前点击的品牌的信息回回显在dialog中
+
+- 因为编辑按钮是放在template中，所以可以通过具名插槽的row拿到当前品牌的全部信息，把信息放在参数中传递给回调函数。**注意：**row的类型是TradeMark类型
+- 此外，修改品牌还需要收集当前id，可以直接往reactive对象上添加新的属性id -> trademarkParams.id = id
+
+```js
+//编辑品牌
+const updateTrademark = (row:TradeMark) => {
+  dialogFormVisible.value = true
+  /合并数据
+  Object.assign(trademarkParams,row)
+}
+```
+
+- 修改成功后应该留在当前页，**解决：**判断当前是添加还是修改，如果是修改的话，调用getHasTrademark()时候应该把当前页传过去 ->     getHasTrademark(trademarkParams.id?currentPage.value:1)
+
+#### 1.5.1 恢复到原始状态
+
+> this.$options.data()：这个是vue原始的状态，也就是数据一开始声明时候的状态
+>
+> this.$data：改变后的data数据
+>
+> 在Vue2中可以使用Object.assign(this.$data,this.$options.data())将表单重置到初始状态
+
+- 在Vue3中我尝试了getCurrentInstance方法拿到ctx和proxy，都无法直接获得this.$options.data和this.$data
+
+**解决：**直接把trademark中的id变为0就可以解决先点击编辑品牌再点击添加品牌会出现title标题错乱的问题，**但是reactive中的属性依然存在没有删除**
+
+
+
+### 1.6品牌管理模块的表单验证
+
+- 品牌名称不能小于两位
+- 必须都要有内容才可以提交
+
+①使用:model=""告诉表单把数据收集到了谁的身上(**注意：**这里的双向绑定要绑定在<el-form>上) ②使用:rules=""传入校验规则 ③为表单项(form-item)设置prop属性为需要验证的特殊键值
+
+- 使用**自定义校验**规则的时候，要把校验函数放在rules前面
+- **上传图片**什么时候触发校验规则呢？ **答：**elementPlus提供了一个表单校验的方法**validate**
+
+```js
+const confirm = () => {
+  formRef.value.validate(async (valid: boolean) => {}
+```
+
+> validate：对整个表单的内容进行验证。 接收一个回调函数，或返回 `Promise`。
+
+- 所以可以获取组件实例，然后在点击确定的时候触发表单校验，解决上传图片表单trigger不触发的问题 - 如果自定义验证规则中的value值那么就是没有上传图片，如果有值就上传了。
+
+```js
+//自定义校验规则 
+const validatorTmName = (_: any, value: any, callBack: any) => {
+  console.log(value)
+  if (value.trim().length >= 2) {
+    callBack()
+  } else {
+    callBack(new Error('品牌名称位数必须大于等于两位'))
+  }
+}
+const validatorLogoUrl = (_: any, value: any, callBack: any) => {
+  //如果图片上传了，value里就有值
+  if (value) {
+    callBack()
+  } else {
+    callBack(new Error('请上传图片'))
+  }
+}
+const rules = {
+  tmName: [
+    { required: true, trigger: 'blur', validator: validatorTmName }
+  ],
+  logoUrl: [
+    { required: true, trigger: 'change', validator: validatorLogoUrl }
+  ]
+}
+```
+
+- **注意：**点击确定按钮触发校验之后校验失败，关闭dialog之后再打开依然拥有图片校验失败提示，需要使用element中提供的API 👇在点击按钮时清除表单校验结果
+
+> clearValidate：移除该表单项的校验结果
+
+```js
+//图片上传成功的钩子 - response为请求成功后服务器返回的地址路径
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response: any) => {
+  trademarkParams.logoUrl = response.data
+  //图片上传成功，清除掉对应图片校验结果
+  formRef.value.clearValidate('logoUrl')
+}
+```
+
+- **注意：**点击添加品牌按钮的时候还没有生成DOM节点，所以拿不到<el-form> **解决：** ①使用nextTick钩子函数来获取到ref节点 ②使用Ts的可选属性`?`  -> formRef.value?.clearValidate('tmName')
+
+```js
+//添加品牌
+const addTrademark = () => {
+  dialogFormVisible.value = true
+  removeImg()
+  //清空输入框 
+  trademarkParams.id = 0
+  trademarkParams.tmName = ''
+  trademarkParams.logoUrl = ''
+  formRef.value?.clearValidate('tmName')
+  formRef.value?.clearValidate('logoUrl')
+}
+```
+
+## 2.商品属性
+
+**思路：**根据一级分类的id捞二级分类的id捞三级分类的数据
+
+- 因为属性管理的头部卡片在其他地方也用到了，所以封装成一个全局组件方便复用，因为直接暴露了所以不需要在组件内引入，只需要直接使用<Category />就可以
+
+### 2.1三级分类下拉菜单
+
+**思路：**组件一挂载就获取一级分类的数据，然后在<el-option>中使用v-for遍历数组，在其中使用:value=""收集当前选中项的id。将数据通过v-model给<el-select>双向绑定
+
+- option组件的label属性为显示文字，value属性即为select下拉菜单收集的数据
+
+```js
+<el-form-item label="一级分类" >
+        <el-select placeholder="请选择" v-model="c1Id">
+          <el-option :label="item.name" v-for="item in c1Arr" :key="item.index" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+```
+
+- 将来父组件还需要使用一、二、三级分类的id去捞对应的属性和属性值，通过table去展示。如果只把分类id存在子组件当中，将来就得涉及到子传父。为了简化步骤，可以**将id存在仓库当中**
+
+#### 2.1.1分类数据存在Pinia
+
+使用选择式API
+
+**思路：**当category组件一挂载时就通知仓库发请求捞数据，然后将数据存在仓库当中，在组件内使用v-for遍历仓库数据展示，同时将收集的数据也存在仓库当中
+
+```js
+import {defineStore} from 'pinia'
+import { reqGetC1 } from '@/api/product/attr';
+let useCategoryStore = defineStore('category',{
+    state:()=>{
+        return {
+            c1Arr:[],
+            c1Id:''
+        }
+    },
+    actions:{
+        async getC1(){
+            let result:any = await reqGetC1()
+            if(result.code == 200){
+                this.c1Arr = result.data
+            }
+        }
+    },
+})
+export default useCategoryStore;
+```
+
+#### 2.1.2三级分类的ts数据类型
+
+```js
+//api product attr types.ts
+export interface ResponseData{
+    code:number,
+    message:string,
+    ok:boolean
+}
+
+//分类的ts类型
+export interface CategoryObj{
+    id:number|string, //id虽然返回的是字符串类型，但是仓库当中存的是number类型
+    name:string,
+    category1Id?:number,
+    category2Id?:number,
+    category3Id?:number
+}
+
+//相应的分类接口返回数据的类型 - 继承公共属性ResponseData,里面额外有CategoryObj类型的数组数据
+export interface CategoryResponse extends ResponseData{
+    data:CategoryObj[]
+}
+```
+
+#### 2.1.3定义仓库的ts类型
+
+```js
+//在store的type下的index.ts中
+//定义分类仓库state对象的ts类型
+export interface categoryState{
+  c1Id:string|number,
+  c1Arr:CategoryObj[]
+}
+```
+
+### 2.2二三级分类的数据
+
+**问题：**什么时候二级分类向接口发请求？ **答：**①当一级分类id存在的时候发请求捞取二级分类的数据 ②在<el-select>的change回调中发
+
+```js
+<el-form-item label="二级分类">
+    <el-select placeholder="请选择" v-model="categoryStore.c2Id" @change="handlerC2">
+      <el-option :label="c2.name" v-for="c2 in categoryStore.c2Arr" :key="c2.id" :value="c2.id"></el-option>
+    </el-select>
+</el-form-item>
+//一级分类下拉菜单选中值得时候会触发，可以保证一级分类的ID有了
+const handler = ()=>{
+    categoryStore.getC2()
+}
+const handlerC2 = ()=>{
+    categoryStore.getC3()
+}
+```
+
+**问题：**当一级分类发生变化的时候，二三级分类的数据得清空
+
+**解决：**在一级分类的下拉菜单的@change事件中，清掉仓库中关于c2、c3的id
+
+```js
+const handler = ()=>{
+    categoryStore.c2Id=''
+    categoryStore.c3Id=''
+    categoryStore.getC2()
+}
+```
+
+### 2.3添加属性按钮禁用
+
+什么时候禁用添加按钮？当仓库中三级分类的id不存在时就禁用
+
+```js
+<el-button type="primary" size="default" icon="Plus" :disabled="categoryStore.c3Id?false:true">添加平台属性</el-button>
+import useCategoryStore from '@/store/modules/category'
+let categoryStore = useCategoryStore()
+```
+
+### 2.4已有属性和属性值的展示
+
+对应接口[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697225223078423646246152550921475/attrInfoListUsingGET) [/admin/product/attrInfoList/{category1Id}/{category2Id}/{category3Id}](http://39.98.123.211:8510/swagger-ui.html#!/2183021697225223078423646246152550921475/attrInfoListUsingGET)
+
+#### 2.4.1定义接口和数据类型
+
+```js
+export const reqAttr = (category1Id:number|string,category2Id:number|string,category3Id:number|string)=>request.get<any,AttrResponseData>(API.ATTR_URL+`${category1Id}/${category2Id}/${category3Id}`)
+```
+
+接口对应的ts类型 - 由小到大
+
+```js
+//属性值对象的ts类型
+export interface AttrValue{
+    id:number,
+    valueName:string,
+    attrId:number
+}
+//存储每一个属性值的数组类型
+export type AttrValueList = AttrValue[]
+//属性对象
+export interface Attr {
+    id:number,
+    attrName:string,
+    category1Id:number,
+    categoryLevel:number
+}
+//存储每一个属性对象的数组ts类型
+export type AttrList = Attr[]
+//属性接口返回的数据的ts类型
+export interface AttrResponseData extends ResponseData{
+    data:Attr[]
+}
+```
+
+#### 2.4.2展示数据
+
+**什么时候向接口发请求?** 当三级分类的id存在的时候才发请求，所以要在组件内监听仓库中的数据 **watch**（注意：三级分类得有id才发请求，要是没有id的话首先得清空数组）
+
+**注意：**如果监听的数据是相应式的话，要写成回调函数形式
+
+```js
+watch(()=>categoryStore.c3Id, async ()=>{
+  if(!categoryStore.c3Id){
+    attrArr.value = []
+    return 
+  }
+  let result:AttrResponseData = await reqAttr(categoryStore.c1Id,categoryStore.c2Id,categoryStore.c3Id)
+  if(result.code == 200){
+    attrArr.value= result.data
+  }
+})
+```
+
+### 2.5添加/修改 属性和属性值
+
+**思路：**点击添加属性值的时候，底部卡片样式改变。输入属性名的时候底部也会属性值也会出现，并且属性值可以换颜色。点击保存按钮之后就新增属性在页面中
+
+1.定义一个变量用于卡片切换 **v-show**
+
+```js
+let scene = ref<number>(1)
+<div v-show="scene == 0">
+<div v-show="scene == 1">
+```
+
+2.切换场景1后，点击取消按钮可以回到场景0
+
+```js
+//取消按钮的回调
+const cancel = () => {
+  scene.value = 0
+}
+```
+
+3.添加新的属性值的时候，要禁用顶部的下拉菜单（因为是给当前的属性添加属性值）使用**父子组件通信** v-bind+props
+
+```js
+<Category :isForbidden="scene"/>
+    
+//子组件
+<el-select v-model="categoryStore.c1Id" @change="handler" placeholder="请选择" :disabled="isForbidden" >
+defineProps(['isForbidden'])
+```
+
+#### 2.5.1给三级分类 添加/修改 属性
+
+对应接口:[POST](http://39.98.123.211:8510/swagger-ui.html#!/2183021697225223078423646246152550921475/saveAttrInfoUsingPOST) [/admin/product/saveAttrInfo](http://39.98.123.211:8510/swagger-ui.html#!/2183021697225223078423646246152550921475/saveAttrInfoUsingPOST)
+
+**思路：**带的参数中有id就是修改，没有id就是新增，两个请求共用一个接口
+
+> //修改需要携带的参数
+>
+> {
+>   "attrName": "string", //已有的属性的名字
+>   "attrValueList": [
+>     {
+>       "attrId": 0, //属性值归属于哪一个属性
+>       "id": 0, //已有的属性值的ID
+>       "valueName": "string" 
+>     }
+>   ],
+>   "categoryId": 0, //已有的属性归属于那个三级分类
+>   "categoryLevel": 0, //代表的是几级分类
+>   "id": 0 //已有的属性的ID
+> }
+
+#### 2.5.2 添加属性
+
+- 输入属性名后，添加属性值按钮才可以点击， 每次一点击就push一个空对象到attrParams的attrValueList中，然后通过双向绑定收集数据到对象中
+- 此外还需要三级分类的ID，在点击添加属性值按钮的时候可以收集到。
+- 在保存按钮的回调中发请求，在成功的回调中切换场景并且再次获取分类属性相关信息
+
+```js
+//保存按钮的回调
+const save = async ()=>{
+  let result = await reqAddOrUpdateAttr(attrParams)
+  if(result.code == 200){
+    scene.value = 0
+    getCList()
+  }
+}
+```
+
+- 此外，**别忘了要清除数据**，在添加属性按钮点击的回调中清空（只需要使用Object.assign把原对象赋值给原数组即可）
+
+```js
+//添加属性按钮的回调
+const addAttr = () => {
+  //每一次点击的时候先清空数据再收集数据
+  Object.assign(attrParams, {
+    attrName: "",
+    attrValueList: [],
+    categoryId: categoryStore.c3Id,
+    categoryLevel: 3
+  })
+  scene.value = 1
+}
+```
+
+#### 2.5.3查看/编辑 模式切换
+
+- 文本框失去焦点的时候变成纯文本，一点击又从文本变回文本框，也就是编辑和查看来回切换
+
+**问题：**如何控制<el-input>的显示与隐藏？
+
+**答：**①定义一个响应式数据控制编辑模式与查看模式的切换 ②但是一个属性的属性值有多个，如果只用一个变量去控制，就会造成全部都切换 ③有多少个属性值就有多少个对象，直接往对象身上追加属性用来控制模式切换
+
+- 注意：模式切换的时候，input框中的内容不能为空，如果为空，弹出提示信息并且将当前项从数组中干掉：splice(当前下标,1)
+- 并且输入框输入的内容不能重复 ：find(item=>{})，如果重复了也需要splice干掉当前项
+
+```js
+<template #="{ row,$index }">
+      <el-input placeholder="请输入属性值名称..." v-model="row.valueName" v-if="row.flag" @blur="toLook(row)"/>
+      <div v-else @click="toEdit(row)">{{ row.valueName }}</div>
+</template>
+
+//添加属性值按钮的回调
+const addAttrValue = () => {
+  attrParams.attrValueList.push({
+    valueName: '',
+    flag:true, //控制每一个属性值编辑模式与切换模式的切换
+  })
+}
+//输入和查看模式切换
+const toLook = (row:AttrValue,$index:number)=>{
+  //非法情况1：输入不能为空
+  if(row.valueName.trim() == ''){
+  //将input输入为空的从数组中干掉
+    attrParams.attrValueList.splice($index,1)
+    ElMessage({
+      type:'error',
+      message:'请输入属性值'
+    })
+    return
+  }
+  //非法情况2：输入不能重复
+  let repeat:any = attrParams.attrValueList.find(item =>{
+    //判断除了当前项以外的其他项
+    if(item!=row){
+      return item.valueName === row.valueName
+    }
+  })
+  if(repeat){
+    //将重复的属性值从数组中干掉
+    attrParams.attrValueList.splice($index,1)
+    ElMessage({
+      type:'error',
+      message:'输入的属性值重复'
+    })
+    return
+  }
+  row.flag = false
+}
+const toEdit = (row:AttrValue)=>{
+  row.flag = true
+}
+```
+
