@@ -5,7 +5,6 @@ import { ElMessage } from 'element-plus'
 import useUserStore from '@/store/modules/user'
 import { GET_TOKEN } from './token'
 
-
 //第一步：利用axios的create方法，去创建axios实例 - axios实例：可以配置请求的基础地址，请求超时时间
 let request = axios.create({
   //基础路径，使用开发环境变量（在.env.development中）

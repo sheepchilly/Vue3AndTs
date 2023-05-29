@@ -1,14 +1,28 @@
 <template>
   <div class="">
     <el-card class="box-card">
-      <el-button type="primary" size="default" icon="Plus" @click="addTrademark">添加品牌</el-button>
+      <el-button
+        type="primary"
+        size="default"
+        icon="Plus"
+        @click="addTrademark"
+      >
+        添加品牌
+      </el-button>
 
       <el-table :data="trademarkArr" style="width: 100%; margin: 10px 0" border>
         <el-table-column label="序号" width="80" type="index" />
         <el-table-column prop="tmName" label="品牌名称" />
         <el-table-column prop="" label="品牌LOGO" class="elTable_column">
           <template #default="{ row, $index }">
-            <img :src="row.logoUrl.indexOf('http') == -1 ? 'http://' + row.logoUrl : row.logoUrl" class="elTable_img" />
+            <img
+              :src="
+                row.logoUrl.indexOf('http') == -1
+                  ? 'http://' + row.logoUrl
+                  : row.logoUrl
+              "
+              class="elTable_img"
+            />
           </template>
         </el-table-column>
         <el-table-column prop="address" label="操作">
@@ -19,7 +33,11 @@
               </el-icon>
             </el-button>
 
-            <el-popconfirm :title="`您确认要删除${row.tmName}吗?`" @confirm="deleteTrademark(row)" width="250px">
+            <el-popconfirm
+              :title="`您确认要删除${row.tmName}吗?`"
+              @confirm="deleteTrademark(row)"
+              width="250px"
+            >
               <template #reference>
                 <el-button type="danger" size="small">
                   <el-icon>
@@ -28,28 +46,59 @@
                 </el-button>
               </template>
             </el-popconfirm>
-
           </template>
-
         </el-table-column>
       </el-table>
 
-      <el-pagination :page-count="totalPage" v-model:current-page="currentPage" v-model:page-size="limit"
-        :page-sizes="[3, 5, 7, 9]" :background="true" layout="prev,pager,next,jumper,->,sizes,total" :total="total"
-        @current-change="getHasTrademark" @size-change="sizeChange" prev-text="上一页" next-text="下一页" />
+      <el-pagination
+        :page-count="totalPage"
+        v-model:current-page="currentPage"
+        v-model:page-size="limit"
+        :page-sizes="[3, 5, 7, 9]"
+        :background="true"
+        layout="prev,pager,next,jumper,->,sizes,total"
+        :total="total"
+        @current-change="getHasTrademark"
+        @size-change="sizeChange"
+        prev-text="上一页"
+        next-text="下一页"
+      />
     </el-card>
 
-    <el-dialog v-model="dialogFormVisible" :title="trademarkParams.id ? '修改品牌' : '添加品牌'">
-      <el-form style="width:80%" :rules="rules" :model="trademarkParams" ref="formRef">
+    <el-dialog
+      v-model="dialogFormVisible"
+      :title="trademarkParams.id ? '修改品牌' : '添加品牌'"
+    >
+      <el-form
+        style="width: 80%"
+        :rules="rules"
+        :model="trademarkParams"
+        ref="formRef"
+      >
         <el-form-item label="品牌名称" label-width="80px" prop="tmName">
-          <el-input placeholder="请输入品牌名称..." v-model="trademarkParams.tmName"></el-input>
+          <el-input
+            placeholder="请输入品牌名称..."
+            v-model="trademarkParams.tmName"
+          ></el-input>
         </el-form-item>
         <el-form-item label="品牌LOGO" label-width="80px" prop="logoUrl">
-          <el-upload ref="picUpload" class="avatar-uploader" action="/api/admin/product/fileUpload"
-            :show-file-list="showFileList" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-            <img v-if="trademarkParams.logoUrl"
-              :src="trademarkParams.logoUrl.indexOf('http://') == -1 ? 'http://' + trademarkParams.logoUrl : trademarkParams.logoUrl"
-              class="avatar" />
+          <el-upload
+            ref="picUpload"
+            class="avatar-uploader"
+            action="/api/admin/product/fileUpload"
+            :show-file-list="showFileList"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img
+              v-if="trademarkParams.logoUrl"
+              :src="
+                trademarkParams.logoUrl.indexOf('http://') == -1
+                  ? 'http://' + trademarkParams.logoUrl
+                  : trademarkParams.logoUrl
+              "
+              class="avatar"
+            />
             <el-icon v-else class="avatar-uploader-icon">
               <Plus />
             </el-icon>
@@ -61,15 +110,22 @@
         <el-button @click="cancel">取消</el-button>
         <el-button type="primary" @click="confirm">确定</el-button>
       </template>
-
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, reactive, computed, nextTick } from 'vue'
-import { reqHasTrademark, reqAddOrUpdateTrademark,reqDeleteTrademark } from '@/api/product/trademark/index.ts'
-import { Records, TradeMark, TradeMarkResponseData } from '@/api/product/trademark/types.ts'
+import {
+  reqHasTrademark,
+  reqAddOrUpdateTrademark,
+  reqDeleteTrademark,
+} from '@/api/product/trademark/index.ts'
+import {
+  Records,
+  TradeMark,
+  TradeMarkResponseData,
+} from '@/api/product/trademark/types.ts'
 import type { UploadProps } from 'element-plus'
 import { ElMessage } from 'element-plus'
 
@@ -81,12 +137,12 @@ let picUpload = ref<any>(null)
 let trademarkArr = ref<Records>([]) //类型是包含全部品牌的Ts类型
 let dialogFormVisible = ref<boolean>(false)
 let trademarkParams = reactive<TradeMark>({
-  logoUrl: "",
-  tmName: ""
+  logoUrl: '',
+  tmName: '',
 })
 let formRef = ref<any>(null)
 
-//自定义校验规则 
+//自定义校验规则
 const validatorTmName = (_: any, value: any, callBack: any) => {
   console.log(value)
   if (value.trim().length >= 2) {
@@ -105,12 +161,8 @@ const validatorLogoUrl = (_: any, value: any, callBack: any) => {
 }
 
 const rules = {
-  tmName: [
-    { required: true, trigger: 'blur', validator: validatorTmName }
-  ],
-  logoUrl: [
-    { required: true, trigger: 'change', validator: validatorLogoUrl }
-  ]
+  tmName: [{ required: true, trigger: 'blur', validator: validatorTmName }],
+  logoUrl: [{ required: true, trigger: 'change', validator: validatorLogoUrl }],
 }
 
 onMounted(async () => {
@@ -134,7 +186,10 @@ const totalPage = computed(() => {
 
 const getHasTrademark = async (page = 1) => {
   currentPage.value = page
-  let result: TradeMarkResponseData = await reqHasTrademark(currentPage.value, limit.value)
+  let result: TradeMarkResponseData = await reqHasTrademark(
+    currentPage.value,
+    limit.value,
+  )
   if (result.code == 200) {
     total.value = result.data.total
     trademarkArr.value = result.data.records
@@ -147,19 +202,19 @@ const sizeChange = () => {
 }
 
 //删除品牌
-const deleteTrademark = async (row:TradeMark) => {
-  let {id} = row
+const deleteTrademark = async (row: TradeMark) => {
+  let { id } = row
   let result = await reqDeleteTrademark(id as number)
-  if(result.code == 200){
+  if (result.code == 200) {
     ElMessage({
-      type:'success',
-      message:'删除品牌成功'
+      type: 'success',
+      message: '删除品牌成功',
     })
     getHasTrademark(currentPage.value)
-  }else{
+  } else {
     ElMessage({
-      type:'error',
-      message:'删除品牌失败'
+      type: 'error',
+      message: '删除品牌失败',
     })
   }
 }
@@ -168,7 +223,7 @@ const deleteTrademark = async (row:TradeMark) => {
 const addTrademark = () => {
   dialogFormVisible.value = true
   removeImg()
-  //清空输入框 
+  //清空输入框
   trademarkParams.id = 0
   trademarkParams.tmName = ''
   trademarkParams.logoUrl = ''
@@ -201,18 +256,17 @@ const confirm = () => {
         dialogFormVisible.value = false
         ElMessage({
           type: 'success',
-          message: trademarkParams.id ? '修改品牌成功' : '添加品牌成功'
+          message: trademarkParams.id ? '修改品牌成功' : '添加品牌成功',
         })
         getHasTrademark(trademarkParams.id ? currentPage.value : 1)
       } else {
         ElMessage({
           type: 'error',
-          message: trademarkParams.id ? '修改品牌失败' : '添加品牌失败'
+          message: trademarkParams.id ? '修改品牌失败' : '添加品牌失败',
         })
       }
     }
   })
-
 }
 
 //图片上传组件API->上传图片之前触发的钩子函数
@@ -236,7 +290,6 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (response: any) => {
   formRef.value.clearValidate('logoUrl')
 }
 </script>
-
 
 <style lang="scss" scoped>
 .elTable_img {
