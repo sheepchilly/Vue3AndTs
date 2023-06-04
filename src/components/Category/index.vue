@@ -6,7 +6,7 @@
           v-model="categoryStore.c1Id"
           @change="handler"
           placeholder="请选择"
-          :disabled="isForbidden"
+          :disabled="isForbidden == 0 ?false:true"
         >
           <el-option
             v-for="c1 in categoryStore.c1Arr"
@@ -22,7 +22,7 @@
           placeholder="请选择"
           v-model="categoryStore.c2Id"
           @change="handlerC2"
-          :disabled="isForbidden"
+          :disabled="isForbidden == 0 ?false:true"
         >
           <el-option
             :label="c2.name"
@@ -37,7 +37,7 @@
         <el-select
           placeholder="请选择"
           v-model="categoryStore.c3Id"
-          :disabled="isForbidden"
+          :disabled="isForbidden == 0 ?false:true"
         >
           <el-option
             :label="c3.name"
