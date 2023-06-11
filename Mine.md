@@ -2983,16 +2983,17 @@ defineProps(['isForbidden'])
 > {
 > "attrName": "string", //已有的属性的名字
 > "attrValueList": [
+>
 > > {
 > > "attrId": 0, //属性值归属于哪一个属性
 > > "id": 0, //已有的属性值的 ID
 > > "valueName": "string"
 > > }
 > > ],
-> "categoryId": 0, //已有的属性归属于那个三级分类
-> "categoryLevel": 0, //代表的是几级分类
-> "id": 0 //已有的属性的 ID
-> }
+> > "categoryId": 0, //已有的属性归属于那个三级分类
+> > "categoryLevel": 0, //代表的是几级分类
+> > "id": 0 //已有的属性的 ID
+> > }
 
 #### 2.5.2 添加属性
 
@@ -3086,23 +3087,23 @@ const toEdit = (row:AttrValue)=>{
 }
 ```
 
-#### 2.5.4表单元素聚焦
+#### 2.5.4 表单元素聚焦
 
-> 在vue3中，ref不仅可以写成字符串形式，也可以写成函数形式，ref=""或 :ref="function"
+> 在 vue3 中，ref 不仅可以写成字符串形式，也可以写成函数形式，ref=""或 :ref="function"
 
-**思路：**定义一个ref数组，用来存储对应的组件实例<el-input>，然后使用函数式ref来收集input的DOM，使用饿了么提供的内置函数.focus()来实现聚焦
+**思路：**定义一个 ref 数组，用来存储对应的组件实例<el-input>，然后使用函数式 ref 来收集 input 的 DOM，使用饿了么提供的内置函数.focus()来实现聚焦
 
-**问题：**怎么样拿到数组当中的组件实例？**为什么拿不到？**响应式数据刚变成真，v-if语句需要开始渲染页面，渲染页面需要耗时间，所有无法第一在响应式数据刚发生变化就拿到DOM
+**问题：**怎么样拿到数组当中的组件实例？**为什么拿不到？**响应式数据刚变成真，v-if 语句需要开始渲染页面，渲染页面需要耗时间，所有无法第一在响应式数据刚发生变化就拿到 DOM
 
-**解决：**使用nextTick获取响应式数据更新后的DOM（**注意了！**获取DOM节点要在nextTick函数中！！！）
+**解决：**使用 nextTick 获取响应式数据更新后的 DOM（**注意了！**获取 DOM 节点要在 nextTick 函数中！！！）
 
 1.点击切换文本框并且聚焦
 
 ```js
-const toEdit = (row: AttrValue,$index:number) => {
+const toEdit = (row: AttrValue, $index: number) => {
   console.log($index)
   row.flag = true
-  nextTick(()=>{
+  nextTick(() => {
     inputArr.value[$index].focus()
   })
 }
@@ -3118,45 +3119,45 @@ const addAttrValue = () => {
     flag: true, //控制每一个属性值编辑模式与切换模式的切换
   })
   //获取最后的<el-input>组件的DOM，让它聚焦
-    nextTick(()=>{
-      inputArr.value[attrParams.attrValueList.length-1].focus()
-    })
+  nextTick(() => {
+    inputArr.value[attrParams.attrValueList.length - 1].focus()
+  })
 }
 ```
 
-### 2.6删除属性值
+### 2.6 删除属性值
 
-**思路：**给删除按钮绑定点击事件，传入$index，然后使用splice方法干掉数组中对应的属性值
+**思路：**给删除按钮绑定点击事件，传入$index，然后使用 splice 方法干掉数组中对应的属性值
 
 ```js
 //删除按钮
-const deleteArr = ($index:number)=>{
-    attrParams.attrValueList.splice($index,1)
+const deleteArr = ($index: number) => {
+  attrParams.attrValueList.splice($index, 1)
 }
 ```
 
-### 2.7修改已有属性值
+### 2.7 修改已有属性值
 
 > 修改引用类型数据的时候一定注意是否对象里面陶对象，如果是的话一定要使用**深拷贝**
 
-**思路：**点击已有属性的时候不仅要切换页面，而且需要将已有的属性展示在页面页面中。①当点击编辑的时候，拿到当前的属性对象row ②将已有的属性对象赋值给attrParams对象 ③使用**Object.assign()**方法进行合并
+**思路：**点击已有属性的时候不仅要切换页面，而且需要将已有的属性展示在页面页面中。① 当点击编辑的时候，拿到当前的属性对象 row ② 将已有的属性对象赋值给 attrParams 对象 ③ 使用**Object.assign()**方法进行合并
 
 **注意：**
 
-1.因为修改和添加属性值共用的是同一个接口，只是利用是否有id来区分是修改还是添加。
+1.因为修改和添加属性值共用的是同一个接口，只是利用是否有 id 来区分是修改还是添加。
 
-2.Object.assign方法是浅拷贝（两个数组指向同一个对象），就算取消了新增，场景0还是会展示新增的属性值。 **解决：**把数组深拷贝一份
+2.Object.assign 方法是浅拷贝（两个数组指向同一个对象），就算取消了新增，场景 0 还是会展示新增的属性值。 **解决：**把数组深拷贝一份
 
 ```js
-const updateAttr = (row:Attr) => {
-  scene.value = 1 
-  Object.assign(attrParams,JSON.parse(JSON.stringify(row)))
+const updateAttr = (row: Attr) => {
+  scene.value = 1
+  Object.assign(attrParams, JSON.parse(JSON.stringify(row)))
 }
 ```
 
-### 2.8删除属性
+### 2.8 删除属性
 
-定义接口 -> 定义类型 -> 引入接口  -> 发送请求
+定义接口 -> 定义类型 -> 引入接口 -> 发送请求
 
 ```js
 //删除属性
@@ -3169,19 +3170,19 @@ const deleteAttr = async (row:Attr) => {
 }
 ```
 
-**注意：**路由跳转的时候组件因为使用的是v-if，所以销毁重建了，但是Pinia仓库中的数据并没有清空。**解决：**使用**onBeforeUnmount**钩子函数在**路由组件销毁**的时候（从当前路由组件切换到别的组件再切回来），使用**$reset**方法把仓库分类相关的数据清空
+**注意：**路由跳转的时候组件因为使用的是 v-if，所以销毁重建了，但是 Pinia 仓库中的数据并没有清空。**解决：**使用**onBeforeUnmount**钩子函数在**路由组件销毁**的时候（从当前路由组件切换到别的组件再切回来），使用**$reset**方法把仓库分类相关的数据清空
 
 ```js
-onBeforeUnmount(()=>{
+onBeforeUnmount(() => {
   categoryStore.$reset()
 })
 ```
 
-## 3.SPU管理
+## 3.SPU 管理
 
 > SPU：电商术语，代表的是一个标准化产品单元
 
-### 3.1SPU数据展示
+### 3.1SPU 数据展示
 
 **思路：**当三级分类有的时候发请求拿数据，然后展示数据
 
@@ -3200,56 +3201,56 @@ const reqGetSPU = (page:number,limit:number,category3Id:number|string)=>request.
 
 ### 3.2 场景切换
 
-因为SPU涉及到三个场景的切换，所以可以封装成一个组件。
+因为 SPU 涉及到三个场景的切换，所以可以封装成一个组件。
 
-> v-if和v-show都可以实现显示与隐藏，但是v-show只需要挂载一次不会销毁重建，但是v-if会销毁再次创建组件
+> v-if 和 v-show 都可以实现显示与隐藏，但是 v-show 只需要挂载一次不会销毁重建，但是 v-if 会销毁再次创建组件
 
-#### 3.2.1 scene从1到0 - 自定义事件
+#### 3.2.1 scene 从 1 到 0 - 自定义事件
 
-在场景0点击取消按钮的时候，通知父组件修改scene的值 - 子传父使用自定义事件 **v-on+emit**
+在场景 0 点击取消按钮的时候，通知父组件修改 scene 的值 - 子传父使用自定义事件 **v-on+emit**
 
 ```js
 //父组件
-const changeScene = (val:number)=>{
+const changeScene = (val: number) => {
   scene.value = val
 }
 //子组件
 let $emit = defineEmits(['changeScene'])
-const cancel = () =>{
-    $emit('changeScene',0)
+const cancel = () => {
+  $emit('changeScene', 0)
 }
 ```
 
-### 3.3修改SPU数据
+### 3.3 修改 SPU 数据
 
-#### 3.3.1SPU数据展示
+#### 3.3.1SPU 数据展示
 
-点击修改按钮后需要发四个请求，因为原本父组件中请求的数据不是完整的，所以还需要依赖三级分类的id再次向服务器发请求捞数据
+点击修改按钮后需要发四个请求，因为原本父组件中请求的数据不是完整的，所以还需要依赖三级分类的 id 再次向服务器发请求捞数据
 
 > 1.获取所有品牌的数据的接口：[/admin/product/baseTrademark/getTrademarkList](http://39.98.123.211:8510/swagger-ui.html#!/21697292602550921475/getTrademarkListUsingGET)
 >
-> 此外，Spu名称的下拉菜单也需要发请求，Spu照片也需要发请求，Spu销售属性也需要发请求
+> 此外，Spu 名称的下拉菜单也需要发请求，Spu 照片也需要发请求，Spu 销售属性也需要发请求
 >
-> 2.获取Spu照片墙的数据的接口 - 需要携带的参数：当前商品的id：[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/getSpuImageListUsingGET) [/admin/product/spuImageList/{spuId}](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/getSpuImageListUsingGET)
+> 2.获取 Spu 照片墙的数据的接口 - 需要携带的参数：当前商品的 id：[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/getSpuImageListUsingGET) [/admin/product/spuImageList/{spuId}](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/getSpuImageListUsingGET)
 >
-> 3.获取Spu列表下的销售属性 - 需要携带的参数：当前商品的id：[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/getSpuSaleAttrListUsingGET) [/admin/product/spuSaleAttrList/{spuId}](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/getSpuSaleAttrListUsingGET)
+> 3.获取 Spu 列表下的销售属性 - 需要携带的参数：当前商品的 id：[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/getSpuSaleAttrListUsingGET) [/admin/product/spuSaleAttrList/{spuId}](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/getSpuSaleAttrListUsingGET)
 >
-> 4.获取Spu列表下一共有多少个销售属性：[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/getBaseSaleAttrListUsingGET) [/admin/product/baseSaleAttrList](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/getBaseSaleAttrListUsingGET)
+> 4.获取 Spu 列表下一共有多少个销售属性：[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/getBaseSaleAttrListUsingGET) [/admin/product/baseSaleAttrList](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/getBaseSaleAttrListUsingGET)
 >
 > 上面四个接口用于展示数据，下面的接口用于更新服务器里的数据
 >
-> 1.更新SPU：[POST](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/updateSpuInfoUsingPOST) [/admin/product/updateSpuInfo](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/updateSpuInfoUsingPOST)
+> 1.更新 SPU：[POST](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/updateSpuInfoUsingPOST) [/admin/product/updateSpuInfo](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/updateSpuInfoUsingPOST)
 >
-> 2.添加一个SPU：[POST](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/saveSpuInfoUsingPOST) [/admin/product/saveSpuInfo](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/saveSpuInfoUsingPOST)
+> 2.添加一个 SPU：[POST](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/saveSpuInfoUsingPOST) [/admin/product/saveSpuInfo](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/saveSpuInfoUsingPOST)
 
-**问题：**①上面四个请求什么时候发送？点击按钮的时候发送
+**问题：**① 上面四个请求什么时候发送？点击按钮的时候发送
 
-- 使用ref拿到子组件的vc实例，然后父组件就可以调用子组件内部的方法。用这种方法就可以在子组件内部发请求而不需要在父组件身上发完请求后再传递给子组件了
-- **注意：**父组件想要通过ref拿到子组件身上的方法和属性，子组件必须要先暴露 **defineExpose({})**
-- 注意了：父组件获取子组件的方法的话正常需要使用nextTick，但是这里使用了v-show，组件只是隐藏和展示，没有涉及组件卸载和挂载
+- 使用 ref 拿到子组件的 vc 实例，然后父组件就可以调用子组件内部的方法。用这种方法就可以在子组件内部发请求而不需要在父组件身上发完请求后再传递给子组件了
+- **注意：**父组件想要通过 ref 拿到子组件身上的方法和属性，子组件必须要先暴露 **defineExpose({})**
+- 注意了：父组件获取子组件的方法的话正常需要使用 nextTick，但是这里使用了 v-show，组件只是隐藏和展示，没有涉及组件卸载和挂载
 
 ```js
-//父组件      
+//父组件
 <SpuForm ref="spuForm" v-show="scene == 1" @changeScene="changeScene"/>
     //修改已有的SPU按钮的回调
 const updateSpu = async (row:SpuData) =>{
@@ -3271,7 +3272,7 @@ let SpuParams = ref<SpuData>({
 const initHasSpuData = async (spu:SpuData) =>{
     SpuParams.value = spu
     let {id} = spu
-    //获取全部品牌的数据 
+    //获取全部品牌的数据
     let result:AllTradeMark = await reqAllTrademark()
     //获取某一个品牌旗下全部售卖商品的图片
     let result1:SpuHasImg = await reqImage((id as number))
@@ -3287,38 +3288,36 @@ const initHasSpuData = async (spu:SpuData) =>{
 }
 ```
 
+#### 3.3.2 SPU 图片信息收集
 
+1.使用 v-model 将数据展示在页面上
 
-#### 3.3.2 SPU图片信息收集
+> <el-upload>展示多张图片用的是 v-model:file-list="响应式数组"
 
-1.使用v-model将数据展示在页面上
-
-> <el-upload>展示多张图片用的是v-model:file-list="响应式数组"
-
-2.收集上传的图片数据，通过action向接口请求发送(**注意：**接口请求一定要带/api) action="/api/admin/product/fileUpload"
+2.收集上传的图片数据，通过 action 向接口请求发送(**注意：**接口请求一定要带/api) action="/api/admin/product/fileUpload"
 
 > action：上传图片的接口地址
 >
 > list-type：文件列表的类型
 
-**注意：**照片墙通过action上传的图片信息里面的是name和url，但是服务器需要的是imgName和imgUrl，所以收集数据的时候还需要改一下对应的字段
+**注意：**照片墙通过 action 上传的图片信息里面的是 name 和 url，但是服务器需要的是 imgName 和 imgUrl，所以收集数据的时候还需要改一下对应的字段
 
-3.点击预览图片，会弹出dialog对话框，其中图片的src地址由点击预览图片的回调中的参数file提供，
+3.点击预览图片，会弹出 dialog 对话框，其中图片的 src 地址由点击预览图片的回调中的参数 file 提供，
 
 ```js
 //图片预览
-const handlePictureCardPreview = (file:any)=>{
-    dialogImage.value = file.url
-    dialogVisible.value = true
+const handlePictureCardPreview = (file: any) => {
+  dialogImage.value = file.url
+  dialogVisible.value = true
 }
 ```
 
-4.使用upload提供的钩子函数 **before-upload** 约束上传的文件类型
+4.使用 upload 提供的钩子函数 **before-upload** 约束上传的文件类型
 
 ```js
 //上传图片之前触发的钩子函数
 const beforeAvatarUpload = (rawFile: any) => {
-  //约束文件的类型 
+  //约束文件的类型
   if (rawFile.type !== 'image/jpeg') {
     ElMessage.error('Avatar picture must be JPG format!')
     return false
@@ -3331,11 +3330,11 @@ const beforeAvatarUpload = (rawFile: any) => {
 }
 ```
 
-#### 3.3.3 SPU销售属性收集
+#### 3.3.3 SPU 销售属性收集
 
-1.属性值的展示因为是在对象中嵌套的对象中，所以需要使用插槽，并且样式时element的tag
+1.属性值的展示因为是在对象中嵌套的对象中，所以需要使用插槽，并且样式时 element 的 tag
 
-**注意：**插槽中的row为当前销售属性的对象，需要展示的是销售属性对象的额属性值，所以v-for遍历的是row.spuSaleAttrValueList
+**注意：**插槽中的 row 为当前销售属性的对象，需要展示的是销售属性对象的额属性值，所以 v-for 遍历的是 row.spuSaleAttrValueList
 
 ```js
 <el-table-column label="属性值">
@@ -3349,7 +3348,7 @@ const beforeAvatarUpload = (rawFile: any) => {
                 </el-table-column>
 ```
 
-2.删除当前属性值，只需要使用splice($index,1)就可以从收集到的数组中删除数据
+2.删除当前属性值，只需要使用 splice($index,1)就可以从收集到的数组中删除数据
 
 ```js
 <template #="{row,$index}">
@@ -3359,7 +3358,7 @@ const beforeAvatarUpload = (rawFile: any) => {
 
 3.销售属性下拉框剩余数据展示
 
-**思路：**将已有的销售属性在全部销售属性中过滤，未收集的数据展示在下拉菜单中，使用**computed**计算出来，其中使用filter搭配every遍历数组中的所有数据，不满足回调函数中的逻辑的就返回
+**思路：**将已有的销售属性在全部销售属性中过滤，未收集的数据展示在下拉菜单中，使用**computed**计算出来，其中使用 filter 搭配 every 遍历数组中的所有数据，不满足回调函数中的逻辑的就返回
 
 ```js
 <el-select :placeholder="`还有${unSelectSaleAttr.length}种选择`" v-model="SpuParams.spuSaleAttrList">
@@ -3384,49 +3383,49 @@ let unSelectSaleAttr = computed(()=>{
                     :value="`${item.id}:${item.name}`"></el-option>
 ```
 
-5.定义一个变量收集还未选择的销售属性的id与属性的名字，将数据收集到<el-select>上
+5.定义一个变量收集还未选择的销售属性的 id 与属性的名字，将数据收集到<el-select>上
 
 ```js
 <el-select :placeholder="`还有${unSelectSaleAttr.length}种选择`" v-model="saleAttrIdAndValueName">
 ```
 
-6.销售属性的按钮是否禁用，取决于saleAttrIdAndValueName是否收集到了数据
+6.销售属性的按钮是否禁用，取决于 saleAttrIdAndValueName 是否收集到了数据
 
 ```js
 <el-button :disabled="saleAttrIdAndValueName?false:true" type="primary" icon="Plus" style="margin:0 10px;">添加销售属性</el-button>
 ```
 
-7.一点击添加按钮就往saleAttr数组当中push，但是push时候要注意数据需要收集的字段。添加完后还需要清空下拉菜单中收集的数据
+7.一点击添加按钮就往 saleAttr 数组当中 push，但是 push 时候要注意数据需要收集的字段。添加完后还需要清空下拉菜单中收集的数据
 
 ```js
 const addSaleAttr = () => {
-    let attr = saleAttrIdAndValueName.value.split(':')
-    let newSaleAttr:SaleAttr ={
-        baseSaleAttrId: attr[0],
-        saleAttrName: attr[1],
-        spuSaleAttrValueList: []
-    }
-    //往数组中追加数据
-    saleAttr.value.push(newSaleAttr)
-    //清空收集的数据
-    saleAttrIdAndValueName.value = ''
+  let attr = saleAttrIdAndValueName.value.split(':')
+  let newSaleAttr: SaleAttr = {
+    baseSaleAttrId: attr[0],
+    saleAttrName: attr[1],
+    spuSaleAttrValueList: [],
+  }
+  //往数组中追加数据
+  saleAttr.value.push(newSaleAttr)
+  //清空收集的数据
+  saleAttrIdAndValueName.value = ''
 }
 ```
 
-8.销售属性点击加号会显示一个<el-input>，也就是出现input的时候隐藏按钮，出现按钮的时候隐藏input。**注意：**不能单纯的使用一个变量来控制所有的input和button的显示与隐藏，要往saleAttr数组中追加属性值。
+8.销售属性点击加号会显示一个<el-input>，也就是出现 input 的时候隐藏按钮，出现按钮的时候隐藏 input。**注意：**不能单纯的使用一个变量来控制所有的 input 和 button 的显示与隐藏，要往 saleAttr 数组中追加属性值。
 
 ```js
 //往数组中追加flag
-const toEdit = (row:SaleAttr) => {
-    row.flag = true
-    row.saleAttrValue = ""
+const toEdit = (row: SaleAttr) => {
+  row.flag = true
+  row.saleAttrValue = ''
 }
-const toLook = (row:SaleAttr) => {
-    row.flag = false
+const toLook = (row: SaleAttr) => {
+  row.flag = false
 }
 ```
 
-**问题1：**怎么样获取输入的属性值？**答：**动态的往数组中追加对象，因为模板中的row拿到的是当前的每一项，所以往数组中追加也是追加到当前项，需要注意的是：字段需要先整理了再追加
+**问题 1：**怎么样获取输入的属性值？**答：**动态的往数组中追加对象，因为模板中的 row 拿到的是当前的每一项，所以往数组中追加也是追加到当前项，需要注意的是：字段需要先整理了再追加
 
 ```js
 //表单元素失去焦点的回调
@@ -3443,7 +3442,7 @@ const toLook = (row:SaleAttr) => {
 }
 ```
 
-往数组中push的时候还需要加条件，判断非法情况，比如说：空的内容 不能收集，重复的内容不能收集。**问题2：**怎么样删除空的tag和重复的tag呢？**答：**为空时直接return，就可以不往数组中追加，这样就避免了输入为空。判断属性值是否重复可以用find方法在数组中查找，然后retrun出去用变量接收，判断变量是否为true，如果为true就return
+往数组中 push 的时候还需要加条件，判断非法情况，比如说：空的内容 不能收集，重复的内容不能收集。**问题 2：**怎么样删除空的 tag 和重复的 tag 呢？**答：**为空时直接 return，就可以不往数组中追加，这样就避免了输入为空。判断属性值是否重复可以用 find 方法在数组中查找，然后 retrun 出去用变量接收，判断变量是否为 true，如果为 true 就 return
 
 ```js
 const toLook = (row:SaleAttr) => {
@@ -3470,34 +3469,34 @@ const toLook = (row:SaleAttr) => {
     }
 ```
 
-9.点击tag的x号就删除当前tag，通过v-for的index可以拿到当前tag的index，使用splice方法就可以删掉当前tag了
+9.点击 tag 的 x 号就删除当前 tag，通过 v-for 的 index 可以拿到当前 tag 的 index，使用 splice 方法就可以删掉当前 tag 了
 
 ```js
 //属性值的tag关闭
-const handleClose = (row:any,index:number) => {
-    row.spuSaleAttrValueList.splice(index,1)
+const handleClose = (row: any, index: number) => {
+  row.spuSaleAttrValueList.splice(index, 1)
 }
 ```
 
 10.点击保存按钮收集全部信息向服务器接口发请求
 
-**思路：**①整理参数   ②发请求->可能是添加也可能是更新，看携带的数据里有没有id   ③获取成功和失败的结果
+**思路：**① 整理参数 ② 发请求->可能是添加也可能是更新，看携带的数据里有没有 id ③ 获取成功和失败的结果
 
-①整理照片墙数据，收集的时候照片的数据和需要收集的数据的字段不一样，所以需要改为接口需要的数据的名字  **map方法遍历数组，return的时候将新的名字return出去**
+① 整理照片墙数据，收集的时候照片的数据和需要收集的数据的字段不一样，所以需要改为接口需要的数据的名字 **map 方法遍历数组，return 的时候将新的名字 return 出去**
 
 ```js
 const save = () => {
-    //1.照片墙数据
-    SpuParams.value.spuImageList = imgList.value.map((item:any)=>{
-        return {
-            imgName:item.name,
-            imgUrl:(item.response && item.response.data) || item.url
-        }
-    })
+  //1.照片墙数据
+  SpuParams.value.spuImageList = imgList.value.map((item: any) => {
+    return {
+      imgName: item.name,
+      imgUrl: (item.response && item.response.data) || item.url,
+    }
+  })
 }
 ```
 
-②整理销售属性的数据
+② 整理销售属性的数据
 
 ```js
 SpuParams.value.spuSaleAttrList = saleAttr.value
@@ -3515,84 +3514,84 @@ if(result.code == 200){
     $emit('changeScene', 0)
 ```
 
-### 3.4添加SPU
+### 3.4 添加 SPU
 
 **思路：**点击按钮的时候获取子组件实例，调用子组件方法让他去发两个请求，获取已有的销售属性和属性值。
 
 #### 3.4.1 初始化请求方法
 
-**思路：**在子组件中定义一个方法，向服务器发请求获取数据，并使用defineExpose对外暴露使父组件可以使用此方法
+**思路：**在子组件中定义一个方法，向服务器发请求获取数据，并使用 defineExpose 对外暴露使父组件可以使用此方法
 
 ```js
 const initAddSpu = () => {
-    console.log('我是子组件')
+  console.log('我是子组件')
 }
 defineExpose({ initAddSpu })
 ```
 
 #### 3.4.2 子组件发请求获取数据
 
-父亲身上有c3Id，调用子组件身上的方法的时候需要将c3Id传过去
+父亲身上有 c3Id，调用子组件身上的方法的时候需要将 c3Id 传过去
 
 ```js
-const initAddSpu = async (c3Id:number | string) => {
-    SpuParams.value.category3Id = c3Id
-    //获取全部品牌的数据
-    let result1: AllTradeMark = await reqAllTrademark()
-    //获取全部销售属性的数据
-    let result2: HasSaleAttrResponseData = await reqAllSaleAttr()
-    //存储数据
-    AllTradeMark.value = result1.data
-    allSaleAttr.value = result2.data
+const initAddSpu = async (c3Id: number | string) => {
+  SpuParams.value.category3Id = c3Id
+  //获取全部品牌的数据
+  let result1: AllTradeMark = await reqAllTrademark()
+  //获取全部销售属性的数据
+  let result2: HasSaleAttrResponseData = await reqAllSaleAttr()
+  //存储数据
+  AllTradeMark.value = result1.data
+  allSaleAttr.value = result2.data
 }
 ```
 
 #### 3.4.3 清空数据
 
-- 点击添加一个新的SPU按钮的时候，除了spuParams的数据以外，照片墙和属性值数组的数据也要清空
+- 点击添加一个新的 SPU 按钮的时候，除了 spuParams 的数据以外，照片墙和属性值数组的数据也要清空
 
 ```js
 const initAddSpu = async (c3Id: number | string) => {
-    //清空数据
-    Object.assign(SpuParams.value, {
-        category3Id: "",//收集三级分类的ID
-        spuName: "",//SPU的名字
-        description: "",//SPU的描述
-        tmId: '',//品牌的ID
-        spuImageList: [],
-        spuSaleAttrList: [],
-    })
-    imgList.value = []
-    saleAttr.value = []
-    saleAttrIdAndValueName.value = ''
-    
-    /* ... */
+  //清空数据
+  Object.assign(SpuParams.value, {
+    category3Id: '', //收集三级分类的ID
+    spuName: '', //SPU的名字
+    description: '', //SPU的描述
+    tmId: '', //品牌的ID
+    spuImageList: [],
+    spuSaleAttrList: [],
+  })
+  imgList.value = []
+  saleAttr.value = []
+  saleAttrIdAndValueName.value = ''
+
+  /* ... */
 }
 ```
 
 #### 3.4.4 修改成功留在当前页，添加回到第一页
 
-**问题：**如何让父组件知道当前是添加还是更新呢？ **答：**在emit里使用对象将场景值和当前状态传递过去，然后父组件接收并使用传过来的对象
+**问题：**如何让父组件知道当前是添加还是更新呢？ **答：**在 emit 里使用对象将场景值和当前状态传递过去，然后父组件接收并使用传过来的对象
 
 ```js
 //子组件
-$emit('changeScene',{flag:0,params:SpuParams.value.id?'update':'add'})
+$emit('changeScene', { flag: 0, params: SpuParams.value.id ? 'update' : 'add' })
 //父组件 - 切换场景的回调函数
-const changeScene = (obj:any)=>{
+const changeScene = (obj: any) => {
   scene.value = obj.flag
-  if(obj.params == 'update'){
+  if (obj.params == 'update') {
     getSpuData(pageNo.value)
-  }else{
+  } else {
     getSpuData()
   }
 }
 ```
 
-### 3.5 添加sku
+### 3.5 添加 sku
 
 **注意：**表单项里面也可以放表单
 
-每一次点击添加按钮，每一个SPU已有的销售属性都是不一样的，所以每一次点击按钮都需要发三个请求。通过ref使父组件拿到子组件实例，触发子组件内部方法，在子组件内部发请求
+每一次点击添加按钮，每一个 SPU 已有的销售属性都是不一样的，所以每一次点击按钮都需要发三个请求。通过 ref 使父组件拿到子组件实例，触发子组件内部方法，在子组件内部发请求
 
 ```js
 <SkuForm v-show="scene == 2" ref="skuForm" @changeScene="changeScene"/>
@@ -3602,24 +3601,28 @@ const addSku = () =>{
 }
 ```
 
-我真服了，没给子组件绑定事件就在那一直用emit妄想触发事件！！
+我真服了，没给子组件绑定事件就在那一直用 emit 妄想触发事件！！
 
 #### 3.5.1 在子组件内发请求
 
-使用的接口是api下的attr下面的reqAttr方法获取属性，以及spu下的reqImage接口获取照片墙数据和获取某一个已有的销售属性reqSpuHasSale
+使用的接口是 api 下的 attr 下面的 reqAttr 方法获取属性，以及 spu 下的 reqImage 接口获取照片墙数据和获取某一个已有的销售属性 reqSpuHasSale
 
-需要发三个请求 ①第一个接口需要三级分类的三个id  ②需要已有的spu的id->已有的id和三级id都在row里，传递row给子组件就可以拿到category3Id和spuId
+需要发三个请求 ① 第一个接口需要三级分类的三个 id ② 需要已有的 spu 的 id->已有的 id 和三级 id 都在 row 里，传递 row 给子组件就可以拿到 category3Id 和 spuId
 
 ```js
-const initSkuData = async (c1Id:number|string,c2Id:number|string,spu:any) =>{
+const initSkuData = async (
+  c1Id: number | string,
+  c2Id: number | string,
+  spu: any,
+) => {
   let c1 = c1Id
   let c2 = c2Id
   //获取平台属性
-  let result:any = await reqAttr(c1,c2,spu.category3Id)
+  let result: any = await reqAttr(c1, c2, spu.category3Id)
   //获取对应的销售属性
-  let result1:any = await reqSpuHasSale(spu.id)
+  let result1: any = await reqSpuHasSale(spu.id)
   //获取照片墙数据
-  let result2:any = await reqImage(spu.id)
+  let result2: any = await reqImage(spu.id)
 
   attrArr.value = result.data
   saleArr.value = result1.data
@@ -3635,9 +3638,9 @@ const initSkuData = async (c1Id:number|string,c2Id:number|string,spu:any) =>{
 
 1.收集数据
 
-- 父类传递过来的数据中就有category相关的数据
-- <el-input>只需要使用v-model既可完成双向数据绑定
-- 平台属性需要收集属性id和属性名，所以使用模板字符串配合:value收集多个数据 -> :value="`${item.id}:${val.id}`"。**数据收集到哪里呢？**将每个数据收集到当前列下的新添加的字段 saleAndAttr身上
+- 父类传递过来的数据中就有 category 相关的数据
+- <el-input>只需要使用 v-model 既可完成双向数据绑定
+- 平台属性需要收集属性 id 和属性名，所以使用模板字符串配合:value 收集多个数据 -> :value="`${item.id}:${val.id}`"。**数据收集到哪里呢？**将每个数据收集到当前列下的新添加的字段 saleAndAttr 身上
 
 ```js
   <el-select v-model="item.attrIdAndValueId">
@@ -3648,36 +3651,36 @@ const initSkuData = async (c1Id:number|string,c2Id:number|string,spu:any) =>{
 2.把图片设置为默认
 
 - 将当前图片对象传递给点击事件的回调函数
-- 将row中的imgUrl赋值给skuParams数组中对应的字段，同时点击设置默认按钮的时候，前面的复选框应该勾选上
+- 将 row 中的 imgUrl 赋值给 skuParams 数组中对应的字段，同时点击设置默认按钮的时候，前面的复选框应该勾选上
 
-**问题：**怎么知道table的select是否选中？
+**问题：**怎么知道 table 的 select 是否选中？
 
-**答：**得获取到DOM，才能操作DOM。再配合上Table的方法toggleRowSelection，直接在设为默认的回调里使得点击设置为默认的同时将复选框选中
+**答：**得获取到 DOM，才能操作 DOM。再配合上 Table 的方法 toggleRowSelection，直接在设为默认的回调里使得点击设置为默认的同时将复选框选中
 
 > `toggleRowSelection`：用于多选表格，切换某一行的选中状态， 如果使用了第二个参数，则可直接设置这一行选中与否
 
 ```js
-const handler = (row:any) => {
+const handler = (row: any) => {
   console.log(table.value)
   //复选框选中
-  table.value.toggleRowSelection(row,true)
+  table.value.toggleRowSelection(row, true)
   //收集图片地址
   skuParams.skuDefaultImg = row.imgUrl
 }
 ```
 
-**注意：**按照上面的选中方法当table有多列的时候，点击选中会全部选中。
+**注意：**按照上面的选中方法当 table 有多列的时候，点击选中会全部选中。
 
 **解决：**使用排他思想，点击的时候先让全部不选中，再让点击的当前项选中
 
 ```js
-const handler = (row:any) => {
+const handler = (row: any) => {
   console.log(table.value)
   //复选框选中
-  imgArr.value.forEach((item:any) => {
-    table.value.toggleRowSelection(item,false)
-  });
-  table.value.toggleRowSelection(row,true)
+  imgArr.value.forEach((item: any) => {
+    table.value.toggleRowSelection(item, false)
+  })
+  table.value.toggleRowSelection(row, true)
   //收集图片地址
   skuParams.skuDefaultImg = row.imgUrl
 }
@@ -3685,79 +3688,238 @@ const handler = (row:any) => {
 
 3.保存按钮
 
-①整理参数 ②发请求 ③成功或者失败的处理
+① 整理参数 ② 发请求 ③ 成功或者失败的处理
 
 （1）平台属性的收集
 
-**思路：**①用for循环遍历attrArr数组，如果当前项有attrIdAndValueId这个属性，就拿出来，组合成一个新的数组。
+**思路：**① 用 for 循环遍历 attrArr 数组，如果当前项有 attrIdAndValueId 这个属性，就拿出来，组合成一个新的数组。
 
-②**重点：**使用reduce累加，用一个变量来接收，它的起始值是一个空数组，它的回调有两个参数(pre,next)，遍历attrArr中的每一项元素，如果它有attrIdAndValueId这个属性，就把这个属性先使用split切成一个数组，再用需要收集的字段来接收它们，接着往新数组的当前项中push split出来的元素。**注意：**reduce接收的是最后一轮返回的结果，所以在最后需要return prev
+②**重点：**使用 reduce 累加，用一个变量来接收，它的起始值是一个空数组，它的回调有两个参数(pre,next)，遍历 attrArr 中的每一项元素，如果它有 attrIdAndValueId 这个属性，就把这个属性先使用 split 切成一个数组，再用需要收集的字段来接收它们，接着往新数组的当前项中 push split 出来的元素。**注意：**reduce 接收的是最后一轮返回的结果，所以在最后需要 return prev
 
 ```js
 const save = () => {
   //整理数据
-  skuParams.skuAttrValueList = attrArr.value.reduce((prev:any,next:any) => {
-    if(next.attrIdAndValueId){
-      let [attrId,valueId] = next.attrIdAndValueId.split(':')
+  skuParams.skuAttrValueList = attrArr.value.reduce((prev: any, next: any) => {
+    if (next.attrIdAndValueId) {
+      let [attrId, valueId] = next.attrIdAndValueId.split(':')
       prev.push({
         attrId,
-        valueId
+        valueId,
       })
     }
     return prev
-  },[])
+  }, [])
 }
 ```
 
 （2）销售属性
 
-**思路：**因为销售属性也是多个下拉菜单组成，所以也可以使用reduce+split+push方法过滤数据
+**思路：**因为销售属性也是多个下拉菜单组成，所以也可以使用 reduce+split+push 方法过滤数据
 
 ```js
-  skuParams.skuSaleAttrValueList = saleArr.value.reduce((prev:any,next:any)=>{
-    if(next.saleIdAndValueId){
-      let [attrId,valueId] = next.saleIdAndValueId.split(':')
+skuParams.skuSaleAttrValueList = saleArr.value.reduce(
+  (prev: any, next: any) => {
+    if (next.saleIdAndValueId) {
+      let [attrId, valueId] = next.saleIdAndValueId.split(':')
       prev.push({
         attrId,
-        valueId
+        valueId,
       })
     }
     return prev
-  },[])
+  },
+  [],
+)
 ```
 
-（3）发请求通知服务器添加新的SKU
+（3）发请求通知服务器添加新的 SKU
 
-- 返回值为200的时候使用emit通知父组件切换场景值
+- 返回值为 200 的时候使用 emit 通知父组件切换场景值
 
 ```js
-  //发请求
-  let result:any = await reqAddSku(skuParams)
-  if(result.code == 200){
-    ElMessage({
-      type:'success',
-      message:'添加成功！'
-    })
-  }
-  $emit('changeScene',{flag:0,params:''})
+//发请求
+let result: any = await reqAddSku(skuParams)
+if (result.code == 200) {
+  ElMessage({
+    type: 'success',
+    message: '添加成功！',
+  })
+}
+$emit('changeScene', { flag: 0, params: '' })
 ```
 
-### 3.6 展示SKU
+### 3.6 展示 SKU
 
-对应接口：根据spuid去找sku[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/findBySpuIdUsingGET) [/admin/product/findBySpuId/{spuId}](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/findBySpuIdUsingGET)
+对应接口：根据 spuid 去找 sku[GET](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/findBySpuIdUsingGET) [/admin/product/findBySpuId/{spuId}](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SKU2550921475/findBySpuIdUsingGET)
 
-**思路：**点击查看SKU列表并且弹出<el-dialog>
+**思路：**点击查看 SKU 列表并且弹出<el-dialog>
 
-### 3.7 删除SKU
+### 3.7 删除 SKU
 
 对应接口：[DELETE](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/deleteSpuUsingDELETE) [/admin/product/deleteSpu/{spuId}](http://39.98.123.211:8510/swagger-ui.html#!/2183021697SPU2550921475/deleteSpuUsingDELETE)
 
-**思路：**删除成功后再次发请求获取全部SPU数据，并且每次路由跳转的时候要清除三级分类的数据 -> 使用**onBeforeUnMounted**钩子，在组件即将销毁的时候清空仓库的数据
+**思路：**删除成功后再次发请求获取全部 SPU 数据，并且每次路由跳转的时候要清除三级分类的数据 -> 使用**onBeforeUnMounted**钩子，在组件即将销毁的时候清空仓库的数据
 
 ```js
 //清空仓库的数据
-onBeforeUnMounted(()=>{
-  categoryStore.$reset;
+onBeforeUnMounted(() => {
+  categoryStore.$reset
 })
+```
+
+
+
+# 九.权限管理
+
+## 1.用户管理
+
+### 1.1获取管理用户分页列表
+
+对应接口：[GET](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/indexUsingGET) [/admin/acl/user/{page}/{limit}](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/indexUsingGET)
+
+样式布局方面注意：<el-table>每一列溢出隐藏只需要在<el-table-column>上添加show-overflow-tooltip即可
+
+### 1.2新增用户
+
+对应接口：
+
+新增 [POST](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/saveUsingPOST) [/admin/acl/user/save](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/saveUsingPOST)
+
+**注意：**添加完或者取消添加后先得清空用户数据  - 用**Object.assign** - 将原对象和新对象进行合并！！！
+
+```js
+Object.assign(UserParams, {
+    username: '',
+    name: '',
+    password: ''
+})
+```
+
+- **表单校验**需要拿到form组件实例才可以，并且每次点击添加用户的时候需要清理某个字段的表单验证信息 - 使用element提供的 **clearValidate**
+- 第一次点击添加用户按钮的时候，组件还没有挂载完毕，所以是没有<el-form>的，这时候要对表单校验进行清除，就需要用到nextTick
+- **注意：**如果表单校验的规则里触发的时机是change时，clearValidate就会出现问题
+
+```js
+let userForm = ref<any>(null)
+const rules = {
+  username: [{ required: true, trigger: 'blur', validator: validatorUsername }],
+  name: [{ required: true, trigger: 'blur', validator: validateName }],
+  password: [{ required: true, trigger: 'blur', message: '请输入密码' }],
+}
+//校验用户名字的回调函数
+const validatorUsername = (rule: any, value: any, callBack: ant) => {
+  if (value.trim().length >= 5) {
+    callBack()
+  } else {
+    callBack(new Error('用户名字至少五位'))
+  }
+}
+//添加用户
+const addUser = () => {
+  //清除上一次表单校验的提示信息
+  nextTick(()=>{
+    userForm.value.clearValidate('username')
+    userForm.value.clearValidate('name')
+    userForm.value.clearValidate('password')
+  })
+```
+
+### 1.3修改用户
+
+对应接口：修改[PUT](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/updateByIdUsingPUT) [/admin/acl/user/update](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/updateByIdUsingPUT)
+
+- 在点击编辑的时候，**首先**将点击的数据通过Object.assign复制给UserParams数组
+- 然后修改用户时，不需要用户密码那一行，所以在<el-form-item>中使用v-if判断当前数组中是否有id这个字段，没有就展示密码输入
+- 发完请求后应该留在当前页，所以发请求的时候判断一下UserParams中是否有id，如果有id就留在当前页（修改），如果没有就回到第一页（新增）
+
+```js
+getHasUser(UserParams.id?pageNo.value:1)
+```
+
+### 1.4当前用户修改
+
+- **问题：**修改当前账号的信息后（自己修改自己的账号），应该查询是否有当前用户信息，没有就回到登录页
+
+**解决：**使用 **window.location.reload()**方法，浏览器自动刷新
+
+
+
+### 1.5用户角色分配
+
+#### 1.5.1 页面 - checkbox
+
+**问：**点击编辑角色按钮之后，怎么将当前点击的用户信息传递给抽屉组件？
+
+**答：**将row赋值给数组UserParams，然后使用v-model="UserParams.username"展示在页面上
+
+- 静态页面 - 复选框<el-checkbox>   多组复选框<el-checkbox-group>+<el-checkbox>
+
+> checkbox中的属性：①indeterminate - 设置不确定的状态，仅设置样式   ②change - 当全选的复选框发生变化时会触发
+>
+> checkbox-group中的v-moel：数据双向绑定收集，**注意：**数据一定要收集到响应式数组中，如果不是响应式的，checkbox会勾不上
+>
+> 复选框全选/全不选：<el-checkbox>的@change回调中提供一个val参数，点击全选时val为true，那么就可以判断，当val为true的时候，让全选对应的数组变为已有的全部属性的数组，否则就为空数组。同时修改indeterminate的状态值为false
+
+```js
+<el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handlerCheckAllChange">Check all</el-checkbox>
+
+let handlerCheckAllChange = (val:boolean) =>{
+  userRole.value = val ? allRole.value : []
+  isIndeterminate.value = false
+}
+```
+
+> 同时<el-checkbox-group>也要绑定@change事件，当所有的复选框都勾上的时候，头顶上的全选也应该勾上
+
+```js
+<el-checkbox-group v-model="userRole" @change="handleCheckedRoleChange">
+
+const handleCheckedRoleChange = (val:string[]) => {
+  const checkCount:number = val.length
+  checkAll.value = checkCount === allRole.value.length
+  isIndeterminate.value = checkCount > 0 && checkCount < allRole.value.length
+}
+```
+
+#### 1.5.2 接口逻辑与数据展示
+
+获取用户职位对应的接口：[GET](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/toAssignUsingGET) [/admin/acl/user/toAssign/{adminId}](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/toAssignUsingGET)
+
+- 发请求获取全部的职位，然后把当前用户已有的职位赋值给对应的数组，这样点击进抽屉的时候就会默认勾选上对应的职位了
+- 选中的数据收集在userRole数组中，通知服务器修改数据时，把userRole数组带上
+
+```js
+const setRole = async (row: User) => {
+  drawer1.value = true
+  Object.assign(UserParams, row)
+  const {id} = row
+  let result:any = await reqGetUserRole((id as number))
+  if(result.code == 200){
+    allRolesList.value = result.data.allRolesList
+    userRole.value = result.data.assignRoles
+  }
+}
+```
+
+#### 1.5.3 数据收集
+
+对应接口：[POST](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/doAssignUsingPOST) [/admin/acl/user/doAssignRole](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/doAssignUsingPOST)
+
+```js
+const saveClick = async () =>{
+  let data:SetRoleData = {
+    userId:(UserParams.id as number),
+    roleIdList:userRole.value.map(item => item.id)
+  }
+  let result:any = await reqSetUserRule(data)
+  if(result.code == 200){
+    drawer1.value = false
+    ElMessage({
+      type:'success',
+      message:'修改成功'
+    })
+    getHasUser(pageNo.value)
+  }
+}
 ```
 

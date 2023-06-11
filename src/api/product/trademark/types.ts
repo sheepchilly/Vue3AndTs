@@ -28,4 +28,3 @@ export interface TradeMarkResponseData extends ResponseData {
     pages: number
   }
 }
-
