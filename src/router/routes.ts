@@ -64,9 +64,9 @@ export const constantRoute = [
         },
       },
       {
-        path: '/acl/rule',
-        component: () => import('@/views/acl/rule/index.vue'),
-        name: 'Rule',
+        path: '/acl/role',
+        component: () => import('@/views/acl/role/index.vue'),
+        name: 'Role',
         meta: {
           hidden: false,
           title: '角色管理',

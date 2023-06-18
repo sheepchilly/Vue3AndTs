@@ -13,6 +13,9 @@ let useLayOutSettingStore = defineStore('SettingStore', {
     changeIconAction() {
       this.fold = !this.fold
     },
+    changeRefsh(){
+      this.refsh = !this.refsh
+    }
   },
 })
 

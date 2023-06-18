@@ -3923,3 +3923,66 @@ const saveClick = async () =>{
 }
 ```
 
+### 1.6用户删除
+
+**删除的时候不要忘了需要气泡确认框！！！**
+
+1.删除单个用户信息对应接口[DELETE](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/removeUsingDELETE) [/admin/acl/user/remove/{id}](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/removeUsingDELETE)
+
+2.删除多个用户信息对应接口[DELETE](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/batchRemoveUsingDELETE) [/admin/acl/user/batchRemove](http://139.198.104.58:8212/swagger-ui.html#!/admin45controller/batchRemoveUsingDELETE) - 也需要带参，需要带删除的多个用户id的数组，所以定义参数的类型是时候要写成number[]这样的数组类型，此外，接口请求中携带的数据要写成对象的形式{data:idList}，因为请求的参数不是data，所以不能简写
+
+- 删除成功后，要留在当前页 -> getHasUser(pageNo)
+
+3.批量删除
+
+> @selection-change:当<el-table>的checkbox被点击时触发
+
+**思路：**①使用@selection-change=""，同时定义一个存放待删除的用户的id的数组，每次checkbox变化的时候，就把id存到数组当中。②每次点击批量删除按钮的时候，就需要对id数组进行过滤，只保留id过滤掉其他信息
+
+```js
+let deleteSelectUser = async() =>{
+  //整理批量删除的参数
+  selectIdArr.value = selectIdArr.value.map(item => {
+    return item.id
+  })
+  let result:any = await reqSelectUser(selectIdArr.value)
+```
+
+
+
+### 1.7用户模糊搜索
+
+对应接口：  ALLUSER_URL = '/admin/acl/user/',
+
+**思路：**定义响应式数据，v-model收集用户输入进来的关键字，点击搜索按钮向服务器发请求。
+
+**注意：**该接口使用的是之前的展示所有用户信息的接口，只需要在原来的接口中多传递一个参数`username`，然后通过 **query** 的方式向服务器传递参数 => `/?username=${username}`
+
+1.给搜索按钮绑定点击事件，在回调函数中只需要getHasUser()就可以获取到用户输入的用户数据展示在下面的表单中
+
+2.搜索完之后需要清空关键字 - keyword.value = ''
+
+3.搜索按钮旁边的重置按钮的 **逻辑：**点击重置之后将仓库SettingStore中的refsh字段修改
+
+
+
+## 2.角色管理
+
+### 2.1获取用户信息
+
+对应接口：[GET](http://139.198.104.58:8212/swagger-ui.html#!/role45controller/indexUsingGET_2) [/admin/acl/role/{page}/{limit}](http://139.198.104.58:8212/swagger-ui.html#!/role45controller/indexUsingGET_2)
+
+
+
+### 2.2添加角色
+
+对应接口：[POST](http://139.198.104.58:8212/swagger-ui.html#!/role45controller/saveUsingPOST_2) [/admin/acl/role/save](http://139.198.104.58:8212/swagger-ui.html#!/role45controller/saveUsingPOST_2)
+
+- 表单校验需要在<el-form>上添加需要校验的对象:model="需要校验的对象名" ，同时<el-form-item>上需要绑定prop
+- 此外还需要给<el-form>上绑定校验的规则 `:rule="rules"`
+- `validate`和`clearValidate`方法必须在nextTick()回调中才可以
+
+**清空对象中的数据用 `Object.assign!!!`**
+
+
+
