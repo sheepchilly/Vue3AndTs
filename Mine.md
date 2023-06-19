@@ -3986,3 +3986,96 @@ let deleteSelectUser = async() =>{
 
 
 
+### 2.3树形控件是否勾选
+
+静态：使用elementpuls的树形控件 - <el-tree>
+
+> Tree树形控件 - 用清晰的层级结构展示信息，可展开或折叠
+>
+> :default-expanded-keys="[2, 3]"：默认展开节点的key数组
+>
+> :default-checked-keys：默认勾选的节点的数据
+>
+> :props：控制树形控件的展示字段
+>
+> default-expand-all：是否默认展开所有节点
+>
+> getCheckedKeys：若节点可用被选中(show-checkbox为true)，它将返回当前选中节点key的数组
+>
+> getHalfCheckedKeys：若节点可被选中(show-checkbox为true)，则返回当前选中的节点的key所组成的数组
+
+对应的接口：[GET](http://139.198.104.58:8212/swagger-ui.html#!/permission45admin45controller/toAssignUsingGET_1) [/admin/acl/permission/toAssign/{roleId}](http://139.198.104.58:8212/swagger-ui.html#!/permission45admin45controller/toAssignUsingGET_1)
+
+**问：**如何知道树形控件勾与不勾？ - **答：** 返回的数据中有一个select字段，为true就是勾选，把select为true的id筛选出来
+
+**问题2：**不能只单纯过滤一级和二级，因为一级控制全部checkbox是否勾选，二级控制三级是否勾选，所以只能筛选四级的select为true的id 
+
+**当嵌套的层数多的时候怎么遍历？** - 使用 `递归`
+
+1.准备一个响应式数组，存储四级select为true的id
+
+```js
+<el-tree :data="menuArr" show-checkbox node-key="id" :default-expanded-keys="[1,2, 3]" :default-checked-keys="selectArr" :props="defaultProps" default-expand-all  />
+//分配权限按钮的回调
+const setPermisstion = async (row:any) => {
+  drawer.value = true
+  //收集当前要分类权限的职位的数据
+  Object.assign(RoleParams,row)
+  let result:any = await reqAllMenuList((RoleParams.id as number))
+  if(result.code == 200){
+    menuArr.value = result.data
+    selectArr.value = filterSelectArr(menuArr.value,[])
+  }
+}
+//递归遍历多层数组，找到子层中select为true的id
+const filterSelectArr = (allData:any,initArr:any) => {
+  allData.forEach((item:any) => {
+    if(item.select && item.level == 4){
+      initArr.push(item.id)
+    }
+    //递归遍历
+    if(item.children && item.children.length>0){
+      filterSelectArr(item.children,initArr)
+    }
+  });
+}
+```
+
+
+
+### 2.4给角色职位分配权限
+
+对应接口：[POST](http://139.198.104.58:8212/swagger-ui.html#!/permission45admin45controller/doAssignUsingPOST_2) [/admin/acl/permission/doAssign](http://139.198.104.58:8212/swagger-ui.html#!/permission45admin45controller/doAssignUsingPOST_2) - 携带的参数（query传参）：职位的id和勾中的id
+
+```js
+export const reqSetPermission = (id:number,permissionid:number[]) => request.post<any,any>(API.SETPERMUSSION_URL+`/?roleId=${id}&permissionId=${permissionid}`)
+```
+
+- **问：**如何拿到当前select为true 的数组？ - 使用elementplus提供的API - `getCheckedKeys`
+
+1.给<el-tree>绑定一个ref，通过ref操作API `getCheckKeys`，拿到子数组中select为true的id ，同时通过ref使用elementplus提供的 `getHalfCheckedKeys`，拿到半选的id数组，再将他们俩合并
+
+```js
+let arr:any = tree.value.getCheckedKeys()
+let halfArr:any = tree.value.getHalfCheckedKeys()
+```
+
+**数组合并方法：**arr.concat
+
+```js
+let permissionId = arr.concat(halfArr)
+```
+
+2.向服务器发完请求后，在成功的回调中使用`window.location.reload()`刷新页面 - **为什么？**因为如果当前的用户权限发生变化后，应该重新向服务器发请求获取当前用户信息，再去根据用户信息动态的判断当前用户有哪些权限
+
+### 2.5删除角色职位
+
+对应的接口：[DELETE](http://139.198.104.58:8212/swagger-ui.html#!/role45controller/removeUsingDELETE_2) [/admin/acl/role/remove/{id}](http://139.198.104.58:8212/swagger-ui.html#!/role45controller/removeUsingDELETE_2)
+
+
+
+## 3.权限管理
+
+### 3.1获取菜单数据
+
+对应的接口：[GET](http://139.198.104.58:8212/swagger-ui.html#!/permission45admin45controller/indexUsingGET_1) [/admin/acl/permission](http://139.198.104.58:8212/swagger-ui.html#!/permission45admin45controller/indexUsingGET_1)
