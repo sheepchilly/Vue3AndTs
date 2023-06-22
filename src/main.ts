@@ -7,6 +7,9 @@ import pinia from '@/store/index.ts'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
+//引入暗黑模式的样式
+import 'element-plus/theme-chalk/dark/css-vars.css'
+
 //配置element-plus国际化
 //@ts-ignore -> 这句话的意思是忽略语法检查
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'

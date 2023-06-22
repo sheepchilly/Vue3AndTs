@@ -65,7 +65,6 @@ export default {
   .layout_slider {
     width: $base-menu-width;
     height: 100vh;
-    background: skyblue;
     background: $base-menu-background;
     transition: width 0.3s ease;
     &.fold {
@@ -76,12 +75,12 @@ export default {
       height: calc(100vh - $base-menu-logo-height);
       .el-menu {
         border-right: none;
-        background: $base-menu-background;
+        // background: $base-menu-background;
       }
     }
   }
   .layout_tabbar {
-    background: $base-tabbar-backgorundColor;
+    // background: $base-tabbar-backgorundColor;
     width: calc(100vw - $base-menu-width);
     height: $base-tabbar-height;
     position: fixed;
@@ -103,7 +102,7 @@ export default {
     top: $base-tabbar-height;
     padding: 20px;
     overflow: auto;
-    background: $base-main-backgroundColor;
+    // background: $base-main-backgroundColor;
     transition: all 0.3s ease;
     &.fold {
       width: calc(100vw - $base-menu-min-width);

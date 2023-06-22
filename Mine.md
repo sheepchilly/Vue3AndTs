@@ -4079,3 +4079,126 @@ let permissionId = arr.concat(halfArr)
 ### 3.1获取菜单数据
 
 对应的接口：[GET](http://139.198.104.58:8212/swagger-ui.html#!/permission45admin45controller/indexUsingGET_1) [/admin/acl/permission](http://139.198.104.58:8212/swagger-ui.html#!/permission45admin45controller/indexUsingGET_1)
+
+
+
+# 十.暗黑模式切换
+
+> 打开开发者工具去找对应的组件，找到头部第三个按钮
+
+- 背景颜色切换使用<el-color-picker>组件
+- 是否切换的开关使用的是<el-switch>，想要将icon图标放在开关里面，需要使用其自带的line-prompt属性
+
+## 1.全局背景颜色切换
+
+1.<el-switch>一开，就要给<html>标签加上类名。
+
+**问：**如何拿到根标签html？ - **答：**需要使用DOM来获取html根节点
+
+```js
+//切换暗黑模式
+const changeDark = () => {
+  let html = document.documentElement;
+  dark.value ? html.className = 'dark' : html.className = ''
+}
+```
+
+2.但是因为我之前搭建框架的时候给侧边栏、头部和main的背景都设置了背景颜色，所以暗黑模式切换的时候会有一点小问题
+
+## 2.全局按钮颜色切换
+
+3.使用js动态的生成按钮的颜色
+
+- 收集用户选中的颜色，点击确定的时候，把根节点的主题样式颜色进行更改，变成用户选中的颜色
+
+```js
+const setColor = () =>{
+  //通知js修改根节点的样式对象的属性与属性值
+  const html = document.documentElement
+  html.style.setProperty('--el-color-primary',color.value)
+}
+```
+
+
+
+# 十一.数据大屏
+
+> 数据大屏使用Echarts图标，主要是解决适配问题。目前数据大屏还没有相应的接口，都是死数据
+
+## 1.适配问题
+
+1.适配问题解决方案
+
+（1）vh+vw：兼容IE8以上
+
+（2）css3的transform
+
+2.使用`position:fixed`让内容固定在一个点上然后设置left和top为50%，通过js计算将内容拽回
+
+（1）在css中添加基点`transform-origin`
+
+```js
+    .screen{
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 1920px;
+      height: 1080px;
+      background: pink;
+      // 设置基点
+      transform-origin: left top;
+    }
+```
+
+（2）添加ref，通过操作DOM元素将<div>拽回到指定的位置上，同时在页面挂载和页面缩放时候重新计算
+
+```js
+onMounted(()=>{
+  screen.value.style.transform = `scale(${getScale()}) translate(-50%,-50%)`
+})
+
+//定义大屏缩放比例
+function getScale(w=1920,h=1080){
+  const ww = window.innerWidth / w;
+  const wh = window.innerHeight / h;
+  return ww<wh? ww:wh;
+}
+//监听视口变化
+window.onresize = () => {
+  //放大或缩小相应的倍数
+  screen.value.style.transform = `scale(${getScale()}) translate(-50%,-50%)`
+}
+```
+
+## 2.头部组件
+
+> 将头部组件拆成公共组件，其中图片背景都是用`background:Url() no-repeat;`来实现
+
+1.头部的首页按钮是一个编程式导航，点击后可以回到首页，使用 **router.push('/home')跳转**
+
+```js
+//首先需要引入路由 useRouter
+import {useRouter} from 'vue-router'
+const $router = useRouter()
+let goHome = () => {
+    $router.push('/home')
+}
+```
+
+2.动态展示时间 -使用插件moment，同时要将时间变成 **动态的** 必须配合上定时器 - 在组件一挂载的时候就开启定时器，让它每一秒都走一次。别忘了在组件销毁的时候清除定时器
+
+```js
+import moment from 'moment'
+let time = ref(moment().format('YYYY年MM月DD日 hh:mm:ss'))
+//组件挂载完毕更新当前的时间
+onMounted(()=>{
+    timer.value = setInterval(() => {
+        time.value = moment().format('YYYY年MM月DD日 hh:mm:ss')
+    }, 1000);
+})
+//组件销毁前清除定时器
+onBeforeUnmount(()=>{
+    clearInterval(timer.value)
+})
+```
+
