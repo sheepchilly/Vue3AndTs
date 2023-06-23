@@ -4202,3 +4202,48 @@ onBeforeUnmount(()=>{
 })
 ```
 
+## 3.左侧组件
+
+### （1）水球图
+
+Echarts如何找水球图的插件？ - 单独安装 `npm i echarts-liquidiff` - 使用 `import 'echarts-liquidfill'`
+
+1.使用echarts的时候需要在onMounted生命周期钩子中，在页面一挂载的时候就加载图表
+
+## 4.中间组件
+
+### （1）地图
+
+1.使用地图图表 - echarts中 `geo`就是地理坐标系组件
+
+2.使用地图的json数据 - 阿里云的dataV地理小工具，在map文件夹下新建map.json用于存放地图数据
+
+3.使用地图前必须先注册中国地图
+
+```js
+import chinaJSON from '@/views/screen/components/map/china'
+echarts.registerMap('china',chinaJSON)
+```
+
+4.初始化图表组件，设置配置项，在其中使用`geo`地图组件
+
+```js
+onMounted(() => {
+    let mychart = echarts.init(map.value)
+    mychart.setOption({
+        //地图组件
+        geo:{
+```
+
+5.飞机航线的效果是在series中设置
+
+
+
+### （2）游客访问量
+
+> 一个图标就是一个系列，多个图表的话，系列就要写成数组
+
+1.想要折线图的过渡变得圆润，就要在系列seriea中找对应的API
+
+2.折线图还可以设置底部填充颜色
+

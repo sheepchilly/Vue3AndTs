@@ -46,7 +46,7 @@ let goHome = ()=>{
 
     .right {
         flex: 1.5;
-        background: url(../images/dataScreen-header-right-bg.png) no-repeat;
+        background: url(../../images/dataScreen-header-right-bg.png) no-repeat;
         background-size: cover;
         display:flex;
         justify-content:space-between;
@@ -54,7 +54,7 @@ let goHome = ()=>{
         .rbtn {
             width: 150px;
             height: 40px;
-            background: url(../images/dataScreen-header-btn-bg-r.png) no-repeat;
+            background: url(../../images/dataScreen-header-btn-bg-r.png) no-repeat;
             background-size: 100% 100%;
             text-align: center;
             line-height: 40px;
@@ -71,14 +71,14 @@ let goHome = ()=>{
 
     .left {
         flex: 1.5;
-        background: url(../images/dataScreen-header-left-bg.png) no-repeat;
+        background: url(../../images/dataScreen-header-left-bg.png) no-repeat;
         background-size: cover;
 
         .lbtn {
             width: 150px;
             height: 40px;
             float: right;
-            background: url(../images/dataScreen-header-btn-bg-l.png) no-repeat;
+            background: url(../../images/dataScreen-header-btn-bg-l.png) no-repeat;
             background-size: 100% 100%;
             text-align: center;
             line-height: 40px;
@@ -93,7 +93,7 @@ let goHome = ()=>{
         .title {
             width: 100%;
             height: 74px;
-            background: url(../images/dataScreen-header-center-bg.png) no-repeat;
+            background: url(../../images/dataScreen-header-center-bg.png) no-repeat;
             background-size: 100% 100%;
             text-align: center;
             line-height: 74px;
