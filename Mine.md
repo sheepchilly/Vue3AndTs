@@ -4247,3 +4247,148 @@ onMounted(() => {
 
 2.折线图还可以设置底部填充颜色
 
+
+
+# 十二.权限
+
+## 1.菜单的权限
+
+### （1）拆分路由
+
+1.静态路由：大家都可以访问到的路由 - Login、首页、数据大屏、404
+
+2.异步路由：不同的身份有的有这个路由，有的没有 - 权限管理（三个子路由）、商品管理模块（四个子路由）
+
+3.任意路由：任意路由（除了上面的路由以外的路由）
+
+- 将路由表中的路由按照上面的描述拆成三部分路由，每一个都export const 向外暴露
+- 后台分配了当前账号允许的权限信息，在后台返回的routes**数组中返回异步路由组件的名字**
+
+### （2）菜单权限的实现
+
+- 路由器动态追加路由，用户一登陆成功，用户信息会包含当前用户拥有的异步路由
+- 过滤筛选等于把所有异步路由的children进行了过滤，下一个用户再进来的时候需要清除上一次路由的信息
+
+1.asyncRoute要根据用户信息里面的routes数组进行筛选，筛选完之后再进行注册
+
+- 在store下的modules下的user.ts中
+
+```js
+//用于过滤当前用户需要展示的异步路由
+function filterAsyncRoute(asyncRoute:any,routes:any){
+  return asyncRoute.filter((item:any) => {
+    if(routes.includes(item.name)){
+      if(item.children&&item.children.length>0){
+        item.children = filterAsyncRoute(item.children,routes)
+      }
+      return true
+    }
+  })
+}
+```
+
+```js
+    //获取用户信息
+    async userInfo() {
+      let result: userInfoReponseData = await reqUserInfo()
+      console.log(result.data.routes)
+      if (result.code == 200) {
+        this.username = result.data.name
+        this.avatar = result.data.avatar
+        //计算当前用户需要展示的异步路由
+        let userAsyncRoute = filterAsyncRoute(asyncRoute,result.data.routes)
+        //菜单的数据 - 数组里面房对象必须得展开
+        this.menuRoutes = [...constantRoute,...userAsyncRoute,anyRoute]
+        return 'ok'
+      } else {
+        return Promise.reject(new Error(result.message))
+      }
+    },
+```
+
+2.计算当前用户需要展示的异步路由
+
+```js
+let userAsyncRoute = filterAsyncRoute(asyncRoute,result.data.routes)
+```
+
+3.整合菜单需要的全部路由（常量路由、异步路由、任意路由）
+
+```js
+this.menuRoutes = [...constantRoute,...userAsyncRoute,anyRoute]
+```
+
+4.**数组中有对象时展开在新的数组中需要使用展开运算符**，动态的添加异步路由和任意路由
+
+```js
+//目前路由器管理的只有常量路由：用户计算完毕的异步路由、任意路由得动态追加
+let newArr = [...userAsyncRoute,anyRoute]
+newArr.forEach((route: any) => {
+  router.addRoute(route)
+})
+```
+
+### （3）菜单权限遗留问题
+
+1.异步路由刷新空白 - 路由守卫放行是根据当前是否有用户名，如果是异步路由，有可能获取到用户信息，但是异步路由还没有加载完毕，所以出现白屏 - **解决：**在src下的permission.ts中使用`next({...to})`->意思是死循环加载，直到路由组件加载完毕
+
+```js
+//没有用户信息就向服务器发请求获取用户信息后再放行
+try {
+  await userStore.userInfo()
+  next({...to})
+```
+
+2.设置菜单管理的权限，不会显示单独菜单管理 - **解决：**深拷贝
+
+```js
+//计算当前用户需要展示的异步路由
+const userAsyncRoute = filterAsyncRoute(cloneDeep(asyncRoute),result.data.routes)
+```
+
+
+
+## 2,按钮的权限
+
+- 按钮的权限也在用户信息中返回，所有的组件都需要判断数组中是否有标识
+
+1.在user.ts仓库中存储从服务器中返回的用户的按钮buttons数组信息
+
+```js
+async userInfo() {
+      let result: any = await reqUserInfo()
+      if (result.code == 200) {
+        this.username = result.data.name
+        this.avatar = result.data.avatar
+        this.buttons = result.data.buttons
+```
+
+2.在对应的路由组件中引入仓库数据，并判断每一个按钮是否拥有权限（这种写法太麻烦，如果路由组件有1000个就要引入1000次）
+
+```js
+//按钮权限的实现
+import useUserStore from '@/store/modules/user'
+//获取用户相关的长裤
+let userStore = useUserStore()
+
+<el-button
+    type="primary"
+    size="default"
+    icon="Plus"
+    @click="addTrademark"
+    v-if="userStore.buttons.includes('btn.trademark.add')"
+  >
+    添加品牌
+  </el-button>
+```
+
+3.使用`全局自定义指令`
+
+①在main.ts中注册
+
+```js
+import { isHasButton } from './directive/has'
+createApp(App)
+  .use(isHasButton)
+```
+

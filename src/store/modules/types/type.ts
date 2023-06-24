@@ -8,7 +8,8 @@ export interface UserState {
   token: null | string
   menuRoutes: RouteRecordRaw[] //路由数组
   username: string
-  avatar: string
+  avatar: string,
+  buttons:string[]
 }
 
 //定义分类仓库state对象的ts类型

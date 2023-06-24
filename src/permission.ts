@@ -33,7 +33,7 @@ router.beforeEach(async (to: any, from: any, next: any) => {
         //没有用户信息就向服务器发请求获取用户信息后再放行
         try {
           await userStore.userInfo()
-          next()
+          next({...to})
         } catch (error) {
           //什么情况下会走catch分支？ 1.token过期，获取不到用户信息 2.用户手动修改本地存储token
           //1.token过期先退出登录 - 把用户信息清空,回到login页面

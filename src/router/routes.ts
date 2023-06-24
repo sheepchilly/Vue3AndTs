@@ -1,4 +1,4 @@
-//对外暴露配置的路由
+//对外暴露配置的路由(常量路由)：全部用户都可以访问到的路由
 export const constantRoute = [
   {
     path: '/login',
@@ -17,6 +17,8 @@ export const constantRoute = [
     redirect: '/home',
     meta: {
       hidden: false,
+      title:'',
+      icon:''
     },
     children: [
       {
@@ -42,12 +44,27 @@ export const constantRoute = [
     },
   },
   {
+    path: '/404',
+    component: () => import('@/views/404/index.vue'),
+    name: '404',
+    meta: {
+      title: '404', //菜单标题
+      hidden: true,
+      icon: 'Tools',
+    },
+  },
+  
+]
+
+//异步路由
+export const asyncRoute = [
+  //权限管理
+  {
     path: '/acl',
     component: () => import('@/layout/index.vue'),
     name: 'Acl',
     meta: {
       title: '权限管理',
-      hidden: false,
       icon: 'Setting',
     },
     //此处重定向是因为面包屑需要重定向
@@ -58,7 +75,6 @@ export const constantRoute = [
         component: () => import('@/views/acl/user/index.vue'),
         name: 'User',
         meta: {
-          hidden: false,
           title: '用户管理',
           icon: 'User',
         },
@@ -68,7 +84,6 @@ export const constantRoute = [
         component: () => import('@/views/acl/role/index.vue'),
         name: 'Role',
         meta: {
-          hidden: false,
           title: '角色管理',
           icon: 'CopyDocument',
         },
@@ -78,19 +93,18 @@ export const constantRoute = [
         component: () => import('@/views/acl/permission/index.vue'),
         name: 'Permission',
         meta: {
-          hidden: false,
           title: '菜单管理',
           icon: 'MessageBox',
         },
       },
     ],
   },
+  //商品管理
   {
     path: '/product',
     component: () => import('@/layout/index.vue'),
     name: 'Product',
     meta: {
-      hidden: false,
       title: '商品管理',
       icon: 'Goods',
     },
@@ -103,7 +117,6 @@ export const constantRoute = [
         name: 'Trademark',
         meta: {
           title: '品牌管理',
-          hidden: false,
           icon: 'ShoppingCart',
         },
       },
@@ -113,7 +126,6 @@ export const constantRoute = [
         name: 'Attr',
         meta: {
           title: '属性管理',
-          hidden: false,
           icon: 'Tickets',
         },
       },
@@ -123,7 +135,6 @@ export const constantRoute = [
         name: 'Spu',
         meta: {
           title: 'SPU管理',
-          hidden: false,
           icon: 'Notification',
         },
       },
@@ -133,23 +144,15 @@ export const constantRoute = [
         name: 'Sku',
         meta: {
           title: 'SKU管理',
-          hidden: false,
           icon: 'Connection',
         },
       },
     ],
   },
-  {
-    path: '/404',
-    component: () => import('@/views/404/index.vue'),
-    name: '404',
-    meta: {
-      title: '404', //菜单标题
-      hidden: true,
-      icon: 'Tools',
-    },
-  },
-  {
+]
+
+//任意路由
+export const anyRoute = {
     path: '/:pathMatch(.*)*', //任意路由匹配：以上路由都没有匹配上时会走这里
     redirect: '/404', //重定向到404页面
     name: 'Any',
@@ -158,5 +161,4 @@ export const constantRoute = [
       hidden: true,
       icon: 'Tools',
     },
-  },
-]
+}

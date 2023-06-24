@@ -26,6 +26,9 @@ import '@/styles/index.scss'
 //引入路由鉴权文件
 import './permission'
 
+//引入自定义指令文件
+import { isHasButton } from './directive/has'
+
 createApp(App)
   .use(ElementPlus, {
     locale: zhCn, //element-plus国际化的配置
@@ -33,4 +36,5 @@ createApp(App)
   .use(globalComponent) //使用全局自定义插件
   .use(router)
   .use(pinia)
+  .use(isHasButton)
   .mount('#app')
